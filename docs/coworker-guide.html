@@ -310,7 +310,68 @@
     flex-wrap: wrap;
   }
 
-  @media (max-width: 620px) {
+  /* ---- print / PDF -------------------------------------------------------
+     Printing a dark-themed page drops the backgrounds but keeps the pale ink,
+     which lands as light grey on white paper. Force the light token set here —
+     these selectors match the specificity of the data-theme rules above and come
+     later in source, so they win in both directions. Wide content also has to
+     stop relying on horizontal scrolling, which clips instead of scrolling on
+     paper.                                                                    */
+
+  @media print {
+    :root,
+    :root[data-theme="dark"],
+    :root[data-theme="light"] {
+      --paper:     #ffffff;
+      --card:      #ffffff;
+      --ink:       #000000;
+      --ink-soft:  #333333;
+      --ink-faint: #565656;
+      --rule:      #7d8a8f;   /* 3.6:1 — thin lines print lighter than they render */
+      --rule-soft: #9aa5a9;   /* 2.5:1 — visible hairline, still subordinate */
+      --accent:    #0a5555;
+      --accent-bg: #ffffff;
+      --pass:      #0f5537;
+      --pass-bg:   #ffffff;
+      --fail:      #7d211b;
+      --fail-bg:   #ffffff;
+      --warn-bg:   #ffffff;
+      --warn-rule: #8a6413;
+      --code-bg:   #ffffff;
+    }
+
+    @page { margin: 16mm 14mm; }
+
+    body { background: #fff; font-size: 10.5pt; line-height: 1.5; }
+    .page { max-width: none; padding: 0; }
+
+    /* Borders print even when background graphics are off, so lean on them. */
+    pre, .callout, .facts, .chip { border: 1px solid var(--rule-soft); }
+    pre { border-left: 2pt solid var(--accent); }
+    .callout { border-left: 2pt solid var(--accent); }
+    .callout.alert { border-left-color: var(--warn-rule); }
+    .chip { border-radius: 2px; padding: 1px 6px; }
+    code { border: 0; }
+
+    /* Nothing may be clipped on paper. */
+    pre { overflow: visible; white-space: pre-wrap; word-break: break-word; }
+    .tw { overflow: visible; }
+    table { font-size: 9.5pt; }
+
+    /* Keep related material together. */
+    h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
+    pre, .callout, .facts, .flow li, tr, .perms li {
+      break-inside: avoid; page-break-inside: avoid;
+    }
+    section { break-before: auto; }
+
+    .masthead { padding-top: 0; }
+    h2 { margin-top: 32px; }
+    a { color: var(--ink); text-decoration: underline; }
+    footer { margin-top: 32px; }
+  }
+
+  @media screen and (max-width: 620px) {
     .page { padding: 0 18px 64px; }
     .facts { grid-template-columns: 1fr; gap: 0; padding: 16px 18px; }
     .facts dt { padding-bottom: 0; border-bottom: 0; }
