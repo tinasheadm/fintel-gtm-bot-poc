@@ -43,8 +43,9 @@ platform. The platform generates the publisher tracking link and appends the
 to a publisher on the Fintel side. Reaching the landing page directly, with no
 `finteltag`, is a legitimate test case: it's what unattributed traffic looks like.
 
-**Or use the hosted copy** — see the Pages URL in the repo's About section once Pages
-is enabled (Settings → Pages → Deploy from branch → `main` / root).
+**Or use the hosted copy** — <https://tinasheadm.github.io/fintel-gtm-bot-poc/> once
+Pages is enabled (Settings → Pages → Deploy from branch → `main` / root). That root URL
+*is* the landing page, and it's the URL to register on the Fintel Connect platform.
 
 ## Setting up GTM
 

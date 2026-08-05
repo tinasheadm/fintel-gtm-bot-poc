@@ -66,7 +66,7 @@ from playwright.sync_api import sync_playwright
 # Paste the publisher tracking link generated on the Fintel Connect platform — it
 # carries the finteltag click ID. Falling back to the bare landing page URL runs the
 # same flow as unattributed traffic.
-ENTRY = "http://localhost:8000/index.html"
+ENTRY = "https://tinasheadm.github.io/fintel-gtm-bot-poc/"
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)      # try headless=False too

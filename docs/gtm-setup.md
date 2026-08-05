@@ -165,7 +165,8 @@ arguments passed to Fintel are unchanged from the supplied snippets.
 
 ## 4. Preview and publish
 
-1. Click **Preview**, enter your test URL (`http://localhost:8000` or your Pages URL).
+1. Click **Preview**, enter your test URL —
+   `https://tinasheadm.github.io/fintel-gtm-bot-poc/` or `http://localhost:8000`.
 2. Tag Assistant opens the site in a new tab and connects.
 3. Walk the flow: landing → offers → apply → submit.
 4. In Tag Assistant, check the left-hand event list:

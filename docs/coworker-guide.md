@@ -11,13 +11,11 @@ rather than hardcoding them.
 
 | | |
 |---|---|
-| Landing page | `https://<REPLACE-WITH-PAGES-URL>/` |
-| Source code | `https://github.com/<REPLACE-WITH-REPO>` |
+| Landing page | <https://tinasheadm.github.io/fintel-gtm-bot-poc/> |
+| Source code | <https://github.com/tinasheadm/fintel-gtm-bot-poc> |
 | GTM container | `GTM-WFD2R889` |
 | Merchant ref | `testmerchantFC` |
 | Fintel program ID | `24490` |
-
-> Fill in the two placeholders before sending this on — the site isn't published yet.
 
 ---
 
