@@ -51,6 +51,36 @@ For a POC where several people are experimenting at once, give everyone **Edit**
 keep **Publish** with one person. Each editor should work in their **own workspace**
 (GTM allows 3 concurrent on the free tier) so you don't overwrite each other.
 
+### View-only access to just this container
+
+The setup for a reviewer who should read the tags but change nothing:
+
+1. **Admin → User Management** (the account-level one, left column).
+2. **+ → Add users** and enter their Google account email. It must be a Google account
+   — a work address only works if it's on Google Workspace or has been registered as a
+   Google account.
+3. **Account Permissions: `User`.** Not Administrator. `User` grants no ability to
+   modify the account, add people, or see other containers you haven't explicitly
+   shared.
+4. Under **Container Permissions**, find **`GTM-WFD2R889`** and set it to **`Read`**.
+   Leave every other container in the account set to **No access** — that's what keeps
+   this scoped to the one project.
+5. **Invite.** They get an email; the container shows up in their GTM home once they
+   accept.
+
+`Read` lets them open the container, inspect every tag, trigger and variable, and view
+the version history. It does not let them edit, create workspaces, use Preview mode, or
+publish. Worth knowing up front: **a `Read` user cannot run GTM Preview**, so they can
+review the tag code but can't watch it fire. If a reviewer needs to see tags firing in
+Tag Assistant, they need **`Edit`** rather than `Read`.
+
+To check what someone currently has, or to remove them: **Admin → User Management**,
+click the person, adjust or use the ⋮ menu → **Remove**.
+
+Nothing in this repo needs GTM access to review — the tag source lives in
+`gtm/generate-container.py` and is readable on GitHub. Container access is only needed
+to see the tags in place or watch them fire.
+
 ---
 
 ## 2. Import the container

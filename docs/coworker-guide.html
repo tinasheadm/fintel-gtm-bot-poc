@@ -1,0 +1,674 @@
+<title>FC GTM Test Harness — Reviewer Guide</title>
+<style>
+  :root {
+    --paper:      #f7f9fa;
+    --card:       #ffffff;
+    --ink:        #121a1e;
+    --ink-soft:   #4a5a61;
+    --ink-faint:  #7a8b93;
+    --rule:       #dde5e8;
+    --rule-soft:  #e9eff1;
+    --accent:     #0d6a6a;
+    --accent-bg:  #e6f2f2;
+    --pass:       #16704a;
+    --pass-bg:    #e4f2eb;
+    --fail:       #9a2f28;
+    --fail-bg:    #f8e8e6;
+    --warn-bg:    #fdf3e3;
+    --warn-rule:  #d9a441;
+    --code-bg:    #f0f4f5;
+
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, "Cascadia Mono", Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:     #0e1416;
+      --card:      #151d20;
+      --ink:       #e2ebee;
+      --ink-soft:  #9fb2b9;
+      --ink-faint: #6f838b;
+      --rule:      #26343a;
+      --rule-soft: #1d282d;
+      --accent:    #4fb3ab;
+      --accent-bg: #102b2b;
+      --pass:      #6cc79b;
+      --pass-bg:   #10281f;
+      --fail:      #e8938a;
+      --fail-bg:   #2b1614;
+      --warn-bg:   #2a2113;
+      --warn-rule: #b98a34;
+      --code-bg:   #101a1d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#0e1416; --card:#151d20; --ink:#e2ebee; --ink-soft:#9fb2b9;
+    --ink-faint:#6f838b; --rule:#26343a; --rule-soft:#1d282d;
+    --accent:#4fb3ab; --accent-bg:#102b2b; --pass:#6cc79b; --pass-bg:#10281f;
+    --fail:#e8938a; --fail-bg:#2b1614; --warn-bg:#2a2113; --warn-rule:#b98a34;
+    --code-bg:#101a1d;
+  }
+  :root[data-theme="light"] {
+    --paper:#f7f9fa; --card:#ffffff; --ink:#121a1e; --ink-soft:#4a5a61;
+    --ink-faint:#7a8b93; --rule:#dde5e8; --rule-soft:#e9eff1;
+    --accent:#0d6a6a; --accent-bg:#e6f2f2; --pass:#16704a; --pass-bg:#e4f2eb;
+    --fail:#9a2f28; --fail-bg:#f8e8e6; --warn-bg:#fdf3e3; --warn-rule:#d9a441;
+    --code-bg:#f0f4f5;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 860px; margin: 0 auto; padding: 0 28px 96px; }
+
+  /* ---- masthead ---------------------------------------------------------- */
+
+  .masthead {
+    border-bottom: 2px solid var(--ink);
+    padding: 56px 0 22px;
+    margin-bottom: 32px;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-size: clamp(30px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -.028em;
+    font-weight: 640;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  .standfirst {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: var(--measure);
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  /* ---- fact table -------------------------------------------------------- */
+
+  .facts {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0 28px;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 20px 24px;
+    margin: 0 0 40px;
+  }
+  .facts dt {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 7px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .facts dd {
+    margin: 0;
+    padding: 7px 0;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    border-bottom: 1px solid var(--rule-soft);
+    word-break: break-all;
+  }
+  .facts dt:last-of-type, .facts dd:last-of-type { border-bottom: 0; }
+  .todo {
+    background: var(--warn-bg);
+    border-bottom: 2px solid var(--warn-rule) !important;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  /* ---- structure --------------------------------------------------------- */
+
+  section { margin: 0 0 8px; }
+
+  h2 {
+    font-size: 13px;
+    font-family: var(--mono);
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 52px 0 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  h2 .num { color: var(--accent); }
+
+  h3 {
+    font-size: 19px;
+    letter-spacing: -.012em;
+    font-weight: 620;
+    margin: 34px 0 10px;
+    text-wrap: balance;
+  }
+  h4 {
+    font-size: 15.5px;
+    font-weight: 640;
+    margin: 26px 0 8px;
+  }
+
+  p, ul, ol { max-width: var(--measure); }
+  p { margin: 0 0 16px; text-wrap: pretty; }
+  ul, ol { margin: 0 0 16px; padding-left: 22px; }
+  li { margin-bottom: 7px; }
+  li::marker { color: var(--ink-faint); }
+
+  strong { font-weight: 640; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: .875em;
+    background: var(--code-bg);
+    padding: .12em .38em;
+    border-radius: 2px;
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--rule-soft);
+    border-left: 2px solid var(--accent);
+    border-radius: 2px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 0 0 18px;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.62;
+  }
+  .cmt { color: var(--ink-faint); }
+
+  /* ---- flow steps -------------------------------------------------------- */
+
+  .flow { list-style: none; padding: 0; margin: 0 0 22px; max-width: none; }
+  .flow li {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 0 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    margin: 0;
+  }
+  .flow .step {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    padding-top: 3px;
+  }
+  .flow .file { font-family: var(--mono); font-size: 14px; font-weight: 600; }
+  .flow .meta { font-size: 14px; color: var(--ink-soft); margin-top: 3px; }
+  .flow .meta code { font-size: 12.5px; }
+  .flow .none { color: var(--ink-faint); font-style: italic; }
+
+  /* ---- callouts ---------------------------------------------------------- */
+
+  .callout {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    border-radius: 2px;
+    padding: 18px 22px;
+    margin: 0 0 22px;
+  }
+  .callout > :last-child { margin-bottom: 0; }
+  .callout.alert { border-left-color: var(--warn-rule); background: var(--warn-bg); }
+  .callout .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* ---- tables ------------------------------------------------------------ */
+
+  .tw { overflow-x: auto; margin: 0 0 22px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    padding: 0 18px 8px 0;
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 18px 10px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+  }
+  td code { font-size: 12.5px; }
+
+  .chip {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .04em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .chip.yes { background: var(--pass-bg); color: var(--pass); }
+  .chip.no  { background: var(--fail-bg); color: var(--fail); }
+
+  .perms { list-style: none; padding: 0; max-width: var(--measure); }
+  .perms li {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: 14px;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    margin: 0;
+  }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 18px;
+    border-top: 2px solid var(--ink);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 620px) {
+    .page { padding: 0 18px 64px; }
+    .facts { grid-template-columns: 1fr; gap: 0; padding: 16px 18px; }
+    .facts dt { padding-bottom: 0; border-bottom: 0; }
+    .facts dd { padding-top: 2px; }
+    .flow li { grid-template-columns: 26px 1fr; gap: 0 10px; }
+    .perms li { grid-template-columns: 1fr; gap: 2px; }
+  }
+</style>
+
+<div class="page">
+
+<header class="masthead">
+  <p class="eyebrow">Bot Detection POC · Reviewer Guide</p>
+  <h1>Fintel Connect tracking scripts, deployed through GTM</h1>
+  <p class="standfirst">
+    A disposable four-page website for testing our tracking scripts the way a real
+    client deploys them — fired from a Google Tag Manager container rather than
+    hardcoded into the page.
+  </p>
+</header>
+
+<dl class="facts">
+  <dt>Landing page</dt>
+  <dd class="todo">https://&lt;pages-url&gt;/ — not published yet</dd>
+  <dt>Source code</dt>
+  <dd class="todo">https://github.com/&lt;repo&gt; — not published yet</dd>
+  <dt>GTM container</dt>
+  <dd>GTM-WFD2R889</dd>
+  <dt>Merchant ref</dt>
+  <dd>testmerchantFC</dd>
+  <dt>Program ID</dt>
+  <dd>24490</dd>
+</dl>
+
+<div class="callout">
+  <span class="label">The point of this</span>
+  <p>
+    The pages contain <strong>no Fintel code at all</strong>. Every Fintel script lives
+    in a GTM Custom HTML tag and is injected into the page at runtime. That indirection
+    is the thing under test — how our scripts behave when a client fires them from a
+    tag container instead of placing them directly in the source.
+  </p>
+</div>
+
+<section>
+  <h2><span class="num">01</span> The flow</h2>
+
+  <p>
+    Four static pages, one domain, no subdomains, no build step. Each page pushes a
+    custom event into the dataLayer; GTM triggers on those events.
+  </p>
+
+  <ol class="flow">
+    <li>
+      <span class="step">01</span>
+      <div>
+        <div class="file">index.html — landing</div>
+        <div class="meta">
+          pushes <code>fc_landing_view</code> → fires
+          <strong>FC – Attribution (Landing)</strong>, which drops the first-party cookie
+        </div>
+      </div>
+    </li>
+    <li>
+      <span class="step">02</span>
+      <div>
+        <div class="file">offers.html — product list</div>
+        <div class="meta">
+          pushes <code>fc_offer_view</code> → <span class="none">no tag, deliberately</span>
+        </div>
+      </div>
+    </li>
+    <li>
+      <span class="step">03</span>
+      <div>
+        <div class="file">apply.html — application form</div>
+        <div class="meta">
+          pushes <code>fc_application_start</code>, <code>fc_application_submit</code>
+          → <span class="none">no tag by default</span>
+        </div>
+      </div>
+    </li>
+    <li>
+      <span class="step">04</span>
+      <div>
+        <div class="file">thank-you.html — submitted</div>
+        <div class="meta">
+          pushes <code>fc_application_submitted</code> → fires
+          <strong>FC – Conversion Pixel</strong>
+        </div>
+      </div>
+    </li>
+  </ol>
+
+  <p>
+    Step 2 exists on purpose. It forces the attribution cookie to survive a navigation
+    before the pixel reads it on step 4 — if the cookie is scoped too narrowly it
+    disappears here, which is exactly the failure worth catching.
+  </p>
+
+  <h3>Getting attributed traffic</h3>
+  <p>
+    The landing page URL gets registered on the Fintel Connect platform.
+    <strong>The platform generates the publisher tracking link and appends the
+    <code>finteltag</code> click ID itself</strong> — don't hand-write a
+    <code>?finteltag=</code> value, because a made-up ID won't resolve to a real
+    publisher on the Fintel side.
+  </p>
+  <p>
+    Reaching the landing page directly, with no click ID, is a valid test case too: it
+    is what unattributed traffic looks like. The landing page displays whichever
+    <code>finteltag</code> value actually arrived, so you can confirm the link worked.
+  </p>
+</section>
+
+<section>
+  <h2><span class="num">02</span> The scripts under test</h2>
+
+  <h3>Step 1 — attribution, on the landing page</h3>
+  <p>Creates the first-party cookie holding the publisher's information.</p>
+<pre><code><span class="cmt">// library: https://cdn.fintelconnect.com/scripts/fcanalytics/v1.js</span>
+fcpixel.attribution("finteltag", 10, "last", "testmerchantFC", COOKIE_DOMAIN);
+<span class="cmt">//                  query param  days  model   merchant ref</span></code></pre>
+
+  <h3>Step 2 — conversion pixel, on the thank-you page</h3>
+  <p>Creates the record in Fintel's system and uses the cookie to attribute the publisher.</p>
+<pre><code><span class="cmt">// library: https://app.fintelconnect.com/assets/scripts/fcanalytics.js</span>
+fcpixel.pxl(24490, orderID, pid, "", 0, 0, "", "testmerchantFC");
+<span class="cmt">//          program         product                merchant ref</span></code></pre>
+
+  <h3>Two changes from the reference snippets</h3>
+
+  <h4>The libraries load programmatically, not <code>&lt;script src&gt;</code> + inline call</h4>
+  <p>
+    The reference snippets pair a <code>&lt;script src&gt;</code> tag with an inline
+    <code>&lt;script&gt;</code> that calls <code>fcpixel</code> immediately. Inside a GTM
+    Custom HTML tag that ordering depends on GTM's <code>document.write</code> shim,
+    which is fragile — and it breaks outright when <code>document.write</code> support is
+    switched off, which you want off for page-speed reasons. Both tags now attach the
+    call to the script's <code>onload</code>:
+  </p>
+<pre><code>var s = document.createElement("script");
+s.src = LIB;
+s.async = false;
+s.onload = run;                     <span class="cmt">// fcpixel is guaranteed to exist by now</span>
+s.onerror = function () { console.error("[GTM][FC] failed to load " + LIB); };
+document.head.appendChild(s);</code></pre>
+  <p>
+    The arguments passed to Fintel are unchanged. The gain is that a blocked CDN — ad
+    blocker, CSP, corporate proxy — produces a clean console error instead of an
+    uncaught <code>fcpixel is not defined</code>.
+  </p>
+
+  <h4>The cookie domain resolves per environment</h4>
+  <p>
+    Production scopes the cookie to <code>.fintelconnect.com</code>. That value cannot
+    work on the test host: a browser only accepts a cookie scoped to the host serving
+    the page, and <code>.github.io</code> is a <em>public suffix</em>, which browsers
+    refuse outright to prevent supercookies. So the tag reads a GTM variable:
+  </p>
+<pre><code>function () {
+  var host = document.location.hostname || "";
+  if (/(^|\.)fintelconnect\.com$/i.test(host)) return ".fintelconnect.com";
+  return host;   <span class="cmt">// GitHub Pages, localhost, staging — scope to the exact host</span>
+}</code></pre>
+
+  <div class="callout alert">
+    <span class="label">If you only remember one thing</span>
+    <p>
+      Same tag in every environment, no edits between them. When someone reports
+      <em>“the cookie never appears”</em>, check this first.
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">03</span> What's in the GTM container</h2>
+
+  <p>
+    Two tags, two triggers, five variables — importable in one click from
+    <code>gtm/fc-bot-detection-poc.json</code> in the repo.
+  </p>
+
+  <p><strong>Tags</strong> — both Custom HTML, firing option <em>Once per event</em>,
+  <code>document.write</code> off:</p>
+  <ul>
+    <li><code>FC – Attribution (Landing)</code> → fires on <code>CE - fc_landing_view</code></li>
+    <li><code>FC – Conversion Pixel (Thank You)</code> → fires on <code>CE - fc_application_submitted</code></li>
+  </ul>
+
+  <p><strong>Triggers</strong> — both Custom Event, matching the event name with <em>equals</em>.</p>
+
+  <p><strong>Variables:</strong></p>
+  <div class="tw">
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Type</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>DLV - orderId</code></td><td>Data Layer Variable</td><td><code>orderId</code></td></tr>
+        <tr><td><code>DLV - pid</code></td><td>Data Layer Variable</td><td><code>pid</code></td></tr>
+        <tr><td><code>FC - Merchant Ref</code></td><td>Constant</td><td><code>testmerchantFC</code></td></tr>
+        <tr><td><code>FC - Program ID</code></td><td>Constant</td><td><code>24490</code></td></tr>
+        <tr><td><code>FC - Cookie Domain</code></td><td>Custom JavaScript</td><td>see section 02</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Reviewing the tag code</h3>
+  <p>
+    You do <strong>not</strong> need GTM access to review the tags. The tag bodies live
+    in <code>gtm/generate-container.py</code>, which generates the importable JSON — so
+    the code reads as a normal diff on GitHub instead of being buried in a JSON blob.
+    Regenerate with:
+  </p>
+<pre><code>python3 gtm/generate-container.py</code></pre>
+
+  <h3>Order IDs</h3>
+  <p>
+    Generated when the application form is submitted, in the format
+    <code>FC-&lt;13-digit timestamp&gt;-&lt;6 chars&gt;</code> — for example
+    <code>FC-1785938373146-5TYSZ3</code>. The alphabet excludes <code>I</code>,
+    <code>O</code>, <code>0</code> and <code>1</code> so IDs can be read aloud without
+    ambiguity. The ID is held in <code>sessionStorage</code> and pushed to the dataLayer
+    for the pixel tag to read.
+  </p>
+  <p>
+    The pixel tag carries its own fallback generator, so firing it manually — without
+    going through the form — still produces a valid ID rather than posting an empty one.
+  </p>
+</section>
+
+<section>
+  <h2><span class="num">04</span> Getting GTM access</h2>
+
+  <p>
+    Ask the container owner for <strong><code>Read</code></strong> access to
+    <code>GTM-WFD2R889</code>. They'll need the Google account email you want it on.
+    What <code>Read</code> gets you:
+  </p>
+
+  <ul class="perms">
+    <li><span class="chip yes">CAN</span><span>open the container and inspect every tag, trigger and variable</span></li>
+    <li><span class="chip yes">CAN</span><span>view the version history</span></li>
+    <li><span class="chip no">CANNOT</span><span>edit anything, create a workspace, or publish</span></li>
+    <li><span class="chip no">CANNOT</span><span>run Preview mode</span></li>
+  </ul>
+
+  <div class="callout alert">
+    <span class="label">Worth knowing before you ask</span>
+    <p>
+      That last one matters. A <code>Read</code> user can review the tag code but cannot
+      watch tags fire in Tag Assistant. <strong>If you need to see the tags firing live,
+      ask for <code>Edit</code> instead of <code>Read</code>.</strong> With
+      <code>Edit</code>, work in your own workspace — GTM allows 3 concurrent workspaces
+      on the free tier, and sharing one means overwriting each other's changes.
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">05</span> Running a test</h2>
+
+  <p>Open the landing page and walk the flow: landing → offers → apply → submit.</p>
+
+  <h3>The debug drawer</h3>
+  <p>
+    Every page has one, bottom-right. Click <strong>FC Debug</strong> or press
+    <code>d</code>. It shows, live:
+  </p>
+  <ul>
+    <li>whether GTM and <code>fcpixel</code> actually loaded</li>
+    <li><strong>every request to <code>fintelconnect.com</code></strong>, kept across the whole session</li>
+    <li>all cookies, with Fintel ones highlighted</li>
+    <li>the dataLayer events pushed on the page</li>
+    <li><strong>automation signals</strong> — <code>navigator.webdriver</code>, headless
+      user agent, Selenium/Phantom driver keys, plugin count, languages, hardware
+      concurrency, timezone, screen vs viewport</li>
+  </ul>
+  <p>
+    <strong>Copy report</strong> puts all of it on your clipboard as JSON — the fastest
+    way to diff a human session against an automated one. Capture a manual run first,
+    then compare.
+  </p>
+  <p>
+    <strong>Reset test</strong> clears cookies and the stored order ID and returns you to
+    step 1. Use it between runs, otherwise you're testing a repeat conversion on an
+    existing cookie rather than a fresh attribution.
+  </p>
+  <p>
+    The drawer only <em>reports</em>. It never blocks, scores or challenges traffic, and
+    it does not change what the Fintel scripts do.
+  </p>
+
+  <h3>What a good run looks like</h3>
+  <div class="tw">
+    <table>
+      <thead>
+        <tr><th>Stage</th><th>Expected</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Landing</td><td>A Fintel cookie appears in the drawer; a request to <code>cdn.fintelconnect.com</code> is logged</td></tr>
+        <tr><td>Offers</td><td>The cookie is <strong>still there</strong> after navigating</td></tr>
+        <tr><td>Thank-you</td><td>Order ID shown on the receipt; a request to <code>app.fintelconnect.com</code> logged</td></tr>
+        <tr><td>Cross-check</td><td>The order ID on the receipt matches the one in the pixel request</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>From the console</h3>
+<pre><code>FCTest.botSignals()        <span class="cmt">// the automation surface a detection script sees</span>
+FCTest.cookies()           <span class="cmt">// all cookies, parsed</span>
+FCTest.fcCookies()         <span class="cmt">// Fintel ones only</span>
+FCTest.getPersistedLog()   <span class="cmt">// every fintelconnect.com request this session</span>
+FCTest.resetAll()          <span class="cmt">// clear and restart the flow</span></code></pre>
+  <p>
+    These are callable from any automation tool that can evaluate JavaScript, which makes
+    Playwright and Puppeteer assertions straightforward. The console also carries
+    <code>[GTM][FC]</code> lines from the tags themselves and <code>[FCTest]</code> lines
+    for each intercepted request.
+  </p>
+  <p>
+    The full scenario matrix — blocked CDN, cookies disabled, repeat conversions, headless
+    vs headed, stealth plugins — is in <code>docs/testing-guide.md</code> in the repo.
+  </p>
+</section>
+
+<section>
+  <h2><span class="num">06</span> Ground rules</h2>
+  <ul>
+    <li>
+      <strong>Dummy data only.</strong> The repo is public and the form is prefilled with
+      obvious placeholders. Leave them. No real names, emails, or financial details.
+    </li>
+    <li>
+      <strong>Test conversions hit the real Fintel program <code>24490</code>.</strong>
+      Coordinate before any bulk automated run so the traffic isn't mistaken for
+      production activity, and agree an order-ID prefix with whoever monitors that
+      program.
+    </li>
+    <li>
+      The harness has no visibility into what Fintel does server-side with these
+      sessions — that side of the comparison has to come from the Fintel platform. What
+      this gives you is a controlled, repeatable client that produces identical traffic
+      apart from the one variable you're changing.
+    </li>
+  </ul>
+</section>
+
+<footer>
+  <span>FC GTM Test Harness · GTM-WFD2R889</span>
+  <span>Internal — bot detection POC</span>
+</footer>
+
+</div>

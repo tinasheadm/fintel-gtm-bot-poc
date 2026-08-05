@@ -64,19 +64,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <p>
       <a class="btn" href="offers.html">See offers</a>
-      <a class="btn btn-ghost" href="?finteltag=testpub123">Reload with a publisher click ID</a>
     </p>
 
-    <h2>Simulating publisher traffic</h2>
+    <h2>Inbound traffic</h2>
     <p>
-      The attribution call reads its click ID from the <code>finteltag</code> query
-      parameter. Append it to this page's URL to imitate an inbound click:
+      Register this page's URL as the landing page on the Fintel Connect platform. The
+      platform issues the publisher tracking link and appends the
+      <code>finteltag</code> click ID itself — arrive here through that link rather than
+      inventing a value, so the cookie carries a click ID the platform can actually
+      resolve back to a publisher.
     </p>
     <div class="receipt">
       <div><span>Landing URL</span><b id="cur-url">—</b></div>
-      <div><span>finteltag param</span><b id="cur-tag">—</b></div>
+      <div><span>finteltag received</span><b id="cur-tag">—</b></div>
       <div><span>Referrer</span><b id="cur-ref">—</b></div>
     </div>
+    <p style="margin-top:12px; font-size:14px; color:var(--muted)">
+      A direct visit shows no <code>finteltag</code>. That is a valid test case — it is
+      what unattributed traffic looks like.
+    </p>
 
     <h2>Notes for the bot-detection POC</h2>
     <p>

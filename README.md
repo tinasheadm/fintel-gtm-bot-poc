@@ -35,8 +35,13 @@ carries its own fallback generator so it never posts an empty order ID.
 cd fintel-gtm-bot-poc && python3 -m http.server 8000
 ```
 
-Then open <http://localhost:8000>. Add `?finteltag=testpub123` to imitate a publisher
-click.
+Then open <http://localhost:8000>.
+
+**Getting attributed traffic.** Register the landing page URL on the Fintel Connect
+platform. The platform generates the publisher tracking link and appends the
+`finteltag` click ID itself — don't invent one, because a made-up value won't resolve
+to a publisher on the Fintel side. Reaching the landing page directly, with no
+`finteltag`, is a legitimate test case: it's what unattributed traffic looks like.
 
 **Or use the hosted copy** — see the Pages URL in the repo's About section once Pages
 is enabled (Settings → Pages → Deploy from branch → `main` / root).
@@ -90,6 +95,7 @@ assets/debug-panel.js        the on-page drawer
 assets/styles.css
 gtm/fc-bot-detection-poc.json    importable GTM container
 gtm/generate-container.py        regenerates the above (python3, stdlib only)
+docs/coworker-guide.md           self-contained guide to send to reviewers
 docs/gtm-setup.md                GTM account, container, tag and access setup
 docs/testing-guide.md            test scenarios incl. automated/bot runs
 ```

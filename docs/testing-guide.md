@@ -11,7 +11,9 @@ conversion on an existing cookie.
 
 ## Baseline — the happy path
 
-1. `index.html?finteltag=testpub123`
+1. Open the landing page **via the tracking link generated on the Fintel Connect
+   platform** — that link carries the `finteltag` click ID. The landing page's
+   *Inbound traffic* panel shows the value that actually arrived.
 2. Drawer → **Cookies**: a Fintel cookie should be listed, carrying the publisher value.
 3. Drawer → **Fintel network calls**: a request to `cdn.fintelconnect.com`.
 4. Click through to offers → confirm the cookie is *still there* after navigating.
@@ -28,7 +30,7 @@ Record: cookie name and value, both request URLs, the order ID.
 
 | # | Scenario | How | What you're looking for |
 |---|----------|-----|-------------------------|
-| 1 | No click ID | Load `index.html` with no query string | Does attribution still set a cookie? With what value? |
+| 1 | No click ID | Load `index.html` directly, not via the tracking link | Does attribution still set a cookie? With what value? This is unattributed traffic. |
 | 2 | Direct-to-conversion | Reset, then go straight to `thank-you.html` | Pixel fires with no cookie — how does Fintel record an unattributed conversion? |
 | 3 | Cookie expiry | Set the cookie, edit its expiry in DevTools → Application → Cookies, then convert | Confirms the 10-day window behaves |
 | 4 | Repeat conversion | Convert twice on one cookie | Duplicate order IDs? Does Fintel dedupe? |
@@ -61,13 +63,16 @@ pip install playwright && playwright install chromium
 ```python
 from playwright.sync_api import sync_playwright
 
-URL = "http://localhost:8000"  # or your Pages URL
+# Paste the publisher tracking link generated on the Fintel Connect platform — it
+# carries the finteltag click ID. Falling back to the bare landing page URL runs the
+# same flow as unattributed traffic.
+ENTRY = "http://localhost:8000/index.html"
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)      # try headless=False too
     page = browser.new_page()
 
-    page.goto(f"{URL}/index.html?finteltag=bottest01")
+    page.goto(ENTRY)
     page.wait_for_timeout(2000)
     print("cookies after landing:", page.context.cookies())
 
