@@ -409,13 +409,12 @@
 <dl class="facts">
   <dt>Landing page</dt>
   <dd>
-    <a href="https://tinasheadm.github.io/fintel-gtm-bot-poc/">https://tinasheadm.github.io/fintel-gtm-bot-poc/</a>
-    <span class="chip pending">not live yet</span>
+    <a href="https://testmerchant.fintelconnect.com/">https://testmerchant.fintelconnect.com/</a>
+    <span class="chip pending">awaiting DNS</span>
   </dd>
   <dt>Source code</dt>
   <dd>
     <a href="https://github.com/tinasheadm/fintel-gtm-bot-poc">https://github.com/tinasheadm/fintel-gtm-bot-poc</a>
-    <span class="chip pending">not live yet</span>
   </dd>
   <dt>GTM container</dt>
   <dd>GTM-WFD2R889</dd>
@@ -426,13 +425,19 @@
 </dl>
 
 <div class="callout alert">
-  <span class="label">Both links 404 right now</span>
+  <span class="label">The landing page needs a DNS record before it resolves</span>
   <p>
-    The repository hasn't been pushed to GitHub yet, so the source code URL returns a
-    404 and GitHub Pages has nothing to serve at the landing page URL. Those are the
-    addresses both will have — they start working once the repo is pushed and Pages is
-    enabled. <strong>If you're reading this and the links are dead, that's why; nothing
-    is broken at your end.</strong>
+    The source code link works now. The landing page does not yet: it needs a
+    <code>CNAME</code> record for <code>testmerchant.fintelconnect.com</code> pointing at
+    <code>tinasheadm.github.io</code>, which has to be added by whoever administers
+    fintelconnect.com DNS. The <code>CNAME</code> file is already committed to the repo.
+  </p>
+  <p>
+    <strong>It has to be a fintelconnect.com host — this is not a preference.</strong>
+    The attribution call scopes its cookie to <code>.fintelconnect.com</code>, and a
+    browser only accepts a cookie scoped to a domain the page is actually served from.
+    Hosted anywhere else, the cookie is silently rejected and no attribution happens, so
+    the test measures nothing.
   </p>
 </div>
 
@@ -450,7 +455,9 @@
   <h2><span class="num">01</span> The flow</h2>
 
   <p>
-    Four static pages, one domain, no subdomains, no build step. Each page pushes a
+    Four static pages on one host, no build step. They are styled as a normal
+    financial-product marketing site so the session presents a realistic commercial
+    surface to the tracking scripts and to anything profiling it. Each page pushes a
     custom event into the dataLayer; GTM triggers on those events.
   </p>
 
@@ -512,8 +519,10 @@
   </p>
   <p>
     Reaching the landing page directly, with no click ID, is a valid test case too: it
-    is what unattributed traffic looks like. The landing page displays whichever
-    <code>finteltag</code> value actually arrived, so you can confirm the link worked.
+    is what unattributed traffic looks like. The debug drawer's <strong>Status</strong>
+    section shows the <code>finteltag</code> value that actually arrived, plus whether
+    the current host can scope the attribution cookie at all, so you can confirm the
+    link worked.
   </p>
 </section>
 
@@ -557,10 +566,11 @@ document.head.appendChild(s);</code></pre>
 
   <h4>The cookie domain resolves per environment</h4>
   <p>
-    Production scopes the cookie to <code>.fintelconnect.com</code>. That value cannot
-    work on the test host: a browser only accepts a cookie scoped to the host serving
-    the page, and <code>.github.io</code> is a <em>public suffix</em>, which browsers
-    refuse outright to prevent supercookies. So the tag reads a GTM variable:
+    The call scopes the cookie to <code>.fintelconnect.com</code>, which is exactly why
+    the harness is served from <code>testmerchant.fintelconnect.com</code> — that value
+    is only valid on a fintelconnect.com host. But the same pages also get run on
+    localhost and on the plain <code>github.io</code> URL during development, where the
+    browser would reject it. So the tag reads a GTM variable rather than a literal:
   </p>
 <pre><code>function () {
   var host = document.location.hostname || "";
@@ -571,8 +581,12 @@ document.head.appendChild(s);</code></pre>
   <div class="callout alert">
     <span class="label">If you only remember one thing</span>
     <p>
-      Same tag in every environment, no edits between them. When someone reports
-      <em>“the cookie never appears”</em>, check this first.
+      Same tag in every environment, no edits between them. On
+      <code>testmerchant.fintelconnect.com</code> it returns
+      <code>.fintelconnect.com</code> and attribution works. Anywhere else it falls back
+      to the exact hostname, so a cookie is still written and the rest of the flow stays
+      testable — but that cookie <strong>will not attribute on the Fintel platform</strong>.
+      When someone reports that a conversion didn't attribute, check the hostname first.
     </p>
   </div>
 </section>

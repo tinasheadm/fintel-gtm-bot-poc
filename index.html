@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Step 1 — Landing | FC GTM Test Harness</title>
+<meta name="robots" content="noindex, nofollow">
+<title>Preferred Chequing Account | Fintel Connect</title>
 <link rel="stylesheet" href="assets/styles.css">
 
 <!-- Test harness. Loads first so it can observe everything GTM does after it. -->
@@ -34,72 +35,204 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WFD2R889"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-<header class="topbar">
-  <strong>Generic Test Co.</strong>
-  <span class="env">GTM-WFD2R889 &middot; test harness</span>
-  <nav class="steps">
-    <span class="now">1 Landing</span>
-    <span>2 Offers</span>
-    <span>3 Apply</span>
-    <span>4 Submitted</span>
-  </nav>
+<div class="envbar">
+  <div class="container">
+    <b>TEST ENVIRONMENT</b>
+    <span>Not a real product offer · GTM-WFD2R889 · merchant testmerchantFC</span>
+  </div>
+</div>
+
+<div class="utility">
+  <div class="container">
+    <a href="#">Find a branch</a>
+    <a href="#">Contact us</a>
+    <a href="#">Sign in</a>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="container">
+    <a class="wordmark" href="index.html">
+      <span class="mark">FC</span> Fintel&nbsp;Connect
+    </a>
+    <nav class="mainnav">
+      <a href="offers.html">Bank accounts</a>
+      <a href="offers.html">Credit cards</a>
+      <a href="#">Mortgages</a>
+      <a href="#">Investing</a>
+    </nav>
+    <span class="spacer"></span>
+    <a class="btn btn-ghost" href="offers.html">Compare accounts</a>
+  </div>
 </header>
 
-<main class="wrap">
-  <div class="card">
-    <h1>Compare our products</h1>
-    <p class="lede">
-      Step 1 of the test flow. This is the page a publisher's traffic lands on, so
-      this is where the Fintel attribution script must run and drop the first-party
-      cookie.
-    </p>
-
-    <div class="note tag">
-      <strong>What should fire here</strong>
-      GTM tag <code>FC – Attribution (Landing)</code>, on the custom event
-      <code>fc_landing_view</code>. It loads <code>fcanalytics/v1.js</code> and calls
-      <code>fcpixel.attribution(...)</code>. Open the FC Debug drawer below and check
-      the Cookies section — a Fintel cookie should appear after the tag fires.
-    </div>
-
-    <p>
-      <a class="btn" href="offers.html">See offers</a>
-    </p>
-
-    <h2>Inbound traffic</h2>
-    <p>
-      Register this page's URL as the landing page on the Fintel Connect platform. The
-      platform issues the publisher tracking link and appends the
-      <code>finteltag</code> click ID itself — arrive here through that link rather than
-      inventing a value, so the cookie carries a click ID the platform can actually
-      resolve back to a publisher.
-    </p>
-    <div class="receipt">
-      <div><span>Landing URL</span><b id="cur-url">—</b></div>
-      <div><span>finteltag received</span><b id="cur-tag">—</b></div>
-      <div><span>Referrer</span><b id="cur-ref">—</b></div>
-    </div>
-    <p style="margin-top:12px; font-size:14px; color:var(--muted)">
-      A direct visit shows no <code>finteltag</code>. That is a valid test case — it is
-      what unattributed traffic looks like.
-    </p>
-
-    <h2>Notes for the bot-detection POC</h2>
-    <p>
-      Nothing on this page blocks, challenges or scores traffic. The harness only
-      records what the GTM-injected scripts request and which automation signals are
-      exposed to them, so you can compare a human session against a driven one.
-      Press <code>d</code> to toggle the drawer.
-    </p>
+<nav class="rail">
+  <div class="container">
+    <ol>
+      <li class="on"><span class="n">1</span> Landing</li>
+      <li><span class="n">2</span> Offers</li>
+      <li><span class="n">3</span> Apply</li>
+      <li><span class="n">4</span> Submitted</li>
+    </ol>
   </div>
-</main>
+</nav>
 
-<script>
-  document.getElementById('cur-url').textContent = location.href;
-  document.getElementById('cur-tag').textContent =
-    new URLSearchParams(location.search).get('finteltag') || '(none)';
-  document.getElementById('cur-ref').textContent = document.referrer || '(none)';
-</script>
+<section class="hero">
+  <div class="container">
+    <div>
+      <p class="eyebrow">Limited time offer</p>
+      <h1>Get up to $450 when you open a Preferred Chequing Account</h1>
+      <p class="lede">
+        Everyday banking with unlimited transactions, no monthly fee for the first
+        year, and a welcome bonus when you set up two eligible direct deposits.
+      </p>
+      <a class="btn btn-light" href="apply.html?pid=Rewards">Open an account</a>
+      <p class="fine">
+        Offer ends 31 December. Conditions apply.<sup>1</sup>
+        <a href="#legal">See full terms</a>
+      </p>
+    </div>
+
+    <aside class="offercard">
+      <span class="tag">Welcome bonus</span>
+      <p class="amount">$450<sup>1</sup></p>
+      <h2>when you open by 31 December</h2>
+      <ul>
+        <li>$350 cash bonus with two direct deposits</li>
+        <li>$100 when you add a linked savings account</li>
+        <li>First-year monthly fee waived ($16.95 value)</li>
+        <li>Unlimited debit transactions</li>
+      </ul>
+      <a class="btn btn-block" href="apply.html?pid=Rewards">Apply online in 10 minutes</a>
+    </aside>
+  </div>
+</section>
+
+<section class="band plain">
+  <div class="container">
+    <h2 class="sec">What you get</h2>
+    <p class="sub">
+      Everyday features on every Preferred Chequing Account, with no minimum balance
+      required to keep them.
+    </p>
+    <div class="grid3">
+      <div class="feature">
+        <div class="ico">∞</div>
+        <h3>Unlimited transactions</h3>
+        <p>Debit purchases, withdrawals, transfers and bill payments with no per-item fee.</p>
+      </div>
+      <div class="feature">
+        <div class="ico">↺</div>
+        <h3>Free Interac e-Transfers</h3>
+        <p>Send and request money at no charge, with no monthly cap on transfers.</p>
+      </div>
+      <div class="feature">
+        <div class="ico">◎</div>
+        <h3>No ATM fees</h3>
+        <p>Withdraw at any machine in the network without a surcharge, nationwide.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band alt">
+  <div class="container">
+    <h2 class="sec">Fees and rates</h2>
+    <p class="sub">Rates shown are illustrative test values and do not reflect a real product.</p>
+    <div class="tablewrap">
+      <table class="rates">
+        <thead>
+          <tr><th scope="col">Item</th><th scope="col">Detail</th><th scope="col">Amount</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Monthly account fee</td><td>Waived first 12 months<sup>2</sup></td><td>$16.95</td></tr>
+          <tr><td>Minimum balance to waive fee</td><td>Ongoing, after year one</td><td>$4,000</td></tr>
+          <tr><td>Interac e-Transfer</td><td>Send and request</td><td>$0.00</td></tr>
+          <tr><td>Overdraft protection</td><td>Optional, monthly</td><td>$5.00</td></tr>
+          <tr><td>Non-network ATM withdrawal</td><td>Per transaction</td><td>$0.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="band plain">
+  <div class="container narrow">
+    <h2 class="sec">Ready to apply?</h2>
+    <p class="sub">
+      You'll need about ten minutes, two pieces of ID, and your employment details.
+      Nothing you enter in this test environment is stored or transmitted.
+    </p>
+    <a class="btn" href="offers.html">Compare all accounts</a>
+    <a class="btn btn-ghost" href="apply.html?pid=Rewards">Start application</a>
+  </div>
+</section>
+
+<section class="band alt" id="legal">
+  <div class="container narrow legal">
+    <h2 class="sec" style="font-size:19px">Legal</h2>
+    <ol>
+      <li>
+        Welcome bonus is illustrative. This is a test environment operated for internal
+        measurement and bot-detection testing. No account can be opened and no offer is
+        available.
+      </li>
+      <li>
+        Fee waiver figures are placeholder values used to give the page realistic
+        structure. They describe no real product.
+      </li>
+      <li>
+        This page loads Google Tag Manager container GTM-WFD2R889 and, through it,
+        Fintel Connect attribution scripts. Traffic here is generated deliberately for
+        testing and should not be read as customer activity.
+      </li>
+    </ol>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="container">
+    <div class="cols">
+      <div>
+        <h4>Bank accounts</h4>
+        <ul>
+          <li><a href="offers.html">Chequing</a></li>
+          <li><a href="offers.html">Savings</a></li>
+          <li><a href="offers.html">Youth and student</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Credit cards</h4>
+        <ul>
+          <li><a href="offers.html">Rewards</a></li>
+          <li><a href="offers.html">Low rate</a></li>
+          <li><a href="offers.html">Secured</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Help centre</a></li>
+          <li><a href="#">Contact us</a></li>
+          <li><a href="#">Accessibility</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#legal">Terms</a></li>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Security</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="base">
+      Fintel Connect test harness — an internal environment for bot-detection and tag
+      measurement testing. Not a financial institution and not an offer of any product.
+    </div>
+  </div>
+</footer>
+
 <script src="assets/debug-panel.js"></script>
 </body>
 </html>

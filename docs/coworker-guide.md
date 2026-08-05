@@ -11,23 +11,29 @@ rather than hardcoding them.
 
 | | | |
 |---|---|---|
-| Landing page | <https://tinasheadm.github.io/fintel-gtm-bot-poc/> | ⏳ not live yet |
-| Source code | <https://github.com/tinasheadm/fintel-gtm-bot-poc> | ⏳ not live yet |
+| Landing page | <https://testmerchant.fintelconnect.com/> | ⏳ awaiting DNS |
+| Source code | <https://github.com/tinasheadm/fintel-gtm-bot-poc> | ✅ live |
 | GTM container | `GTM-WFD2R889` | |
 | Merchant ref | `testmerchantFC` | |
 | Fintel program ID | `24490` | |
 
-> **Both links 404 right now.** The repository hasn't been pushed to GitHub yet, so the
-> source code URL returns a 404 and GitHub Pages has nothing to serve at the landing
-> page URL. Those are the addresses both will have — they start working once the repo is
-> pushed and Pages is enabled. If you're reading this and the links are dead, that's
-> why; nothing is broken at your end.
+> **The landing page needs a DNS record before it resolves.** The source code link works
+> now. The landing page needs a `CNAME` record for `testmerchant.fintelconnect.com`
+> pointing at `tinasheadm.github.io`, added by whoever administers fintelconnect.com DNS.
+> The `CNAME` file is already committed to the repo.
+>
+> **It has to be a fintelconnect.com host — this is not a preference.** The attribution
+> call scopes its cookie to `.fintelconnect.com`, and a browser only accepts a cookie
+> scoped to a domain the page is actually served from. Hosted anywhere else the cookie is
+> silently rejected and no attribution happens, so the test measures nothing.
 
 ---
 
 ## 1. The flow
 
-Four static pages, one domain, no subdomains, no build step.
+Four static pages on one host, no build step. They are styled as a normal
+financial-product marketing site so the session presents a realistic commercial surface
+to the tracking scripts and to anything profiling it.
 
 | # | Page | dataLayer event pushed | GTM tag that fires |
 |---|------|------------------------|--------------------|
@@ -48,8 +54,9 @@ don't hand-write a `?finteltag=` value, because a made-up ID won't resolve to a 
 publisher on the Fintel side.
 
 Arriving at the landing page directly, with no click ID, is a valid test case too — it
-is what unattributed traffic looks like. The landing page shows which `finteltag` value
-actually arrived, so you can confirm the link worked.
+is what unattributed traffic looks like. The debug drawer's **Status** section shows the
+`finteltag` value that actually arrived, plus whether the current host can scope the
+attribution cookie at all, so you can confirm the link worked.
 
 ---
 
@@ -97,10 +104,12 @@ The arguments passed to Fintel are unchanged. The benefit is that a blocked CDN 
 blocker, CSP, corporate proxy — produces a clean console error instead of an
 uncaught `fcpixel is not defined`.
 
-**2. The cookie domain is resolved per environment.** Production scopes the cookie to
-`.fintelconnect.com`. That value cannot work on the test host: a browser only accepts a
-cookie scoped to the host serving the page, and `.github.io` is a *public suffix*, which
-browsers refuse outright to prevent supercookies. So the tag reads a GTM variable:
+**2. The cookie domain is resolved per environment.** The call scopes the cookie to
+`.fintelconnect.com`, which is exactly why the harness is served from
+`testmerchant.fintelconnect.com` — that value is only valid on a fintelconnect.com host.
+The same pages also get run on localhost and on the plain `github.io` URL during
+development, where the browser would reject it. So the tag reads a GTM variable rather
+than a literal:
 
 ```js
 function () {
@@ -110,8 +119,12 @@ function () {
 }
 ```
 
-Same tag in every environment, no edits between them. **If you're debugging a "the
-cookie never appears" report, check this first.**
+Same tag in every environment, no edits between them. On
+`testmerchant.fintelconnect.com` it returns `.fintelconnect.com` and attribution works.
+Anywhere else it falls back to the exact hostname, so a cookie is still written and the
+rest of the flow stays testable — but that cookie **will not attribute on the Fintel
+platform**. **If you're debugging a conversion that didn't attribute, check the hostname
+first.**
 
 ---
 

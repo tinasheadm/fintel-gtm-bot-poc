@@ -122,12 +122,12 @@ function () {
 }
 ```
 
-**Why this exists.** The production call scopes the cookie to `.fintelconnect.com`. A
-browser only accepts a cookie scoped to the host serving the page, so on
-`*.github.io` or `localhost` that value is rejected and the cookie never appears —
-`.github.io` is a public suffix, which browsers refuse outright to protect against
-supercookies. Returning the exact hostname off-production keeps the cookie working
-without editing the tag between environments.
+**Why this exists.** The call scopes the cookie to `.fintelconnect.com`, and a browser
+only accepts a cookie scoped to a domain the page is served from. The harness is hosted
+at `testmerchant.fintelconnect.com` precisely so that value is valid — attribution
+cannot be tested anywhere else. Off that domain (localhost, a plain `github.io` URL) the
+variable falls back to the exact hostname so a cookie is still written and the rest of
+the flow stays testable, but that cookie will not attribute on the Fintel platform.
 
 Also enable the built-in variables **Page URL, Page Hostname, Page Path, Referrer,
 Event, Debug Mode** (Variables → Configure).
@@ -166,7 +166,9 @@ arguments passed to Fintel are unchanged from the supplied snippets.
 ## 4. Preview and publish
 
 1. Click **Preview**, enter your test URL —
-   `https://tinasheadm.github.io/fintel-gtm-bot-poc/` or `http://localhost:8000`.
+   `https://testmerchant.fintelconnect.com/` or `http://localhost:8000`.
+   Attribution only behaves correctly on the fintelconnect.com host; see the cookie
+   domain note below.
 2. Tag Assistant opens the site in a new tab and connects.
 3. Walk the flow: landing → offers → apply → submit.
 4. In Tag Assistant, check the left-hand event list:

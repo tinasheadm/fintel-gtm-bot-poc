@@ -10,7 +10,8 @@ tag and is injected at runtime — that is the behaviour under test.
 - **Container:** `GTM-WFD2R889`
 - **Merchant ref:** `testmerchantFC`
 - **Program ID:** `24490`
-- Single domain, no subdomains, static HTML, no build step.
+- **Host:** `testmerchant.fintelconnect.com` — the cookie domain requires it
+- Static HTML, one host, no build step.
 
 ---
 
@@ -43,9 +44,30 @@ platform. The platform generates the publisher tracking link and appends the
 to a publisher on the Fintel side. Reaching the landing page directly, with no
 `finteltag`, is a legitimate test case: it's what unattributed traffic looks like.
 
-**Or use the hosted copy** — <https://tinasheadm.github.io/fintel-gtm-bot-poc/> once
-Pages is enabled (Settings → Pages → Deploy from branch → `main` / root). That root URL
-*is* the landing page, and it's the URL to register on the Fintel Connect platform.
+**Hosted copy** — <https://testmerchant.fintelconnect.com/>. That root URL *is* the
+landing page, and it's the URL to register on the Fintel Connect platform.
+
+## Why the site must be served from fintelconnect.com
+
+The attribution call scopes its cookie to `.fintelconnect.com`. A browser only accepts a
+cookie scoped to a domain the page is actually served from, so on `*.github.io` — or any
+other host — that cookie is silently rejected and **no attribution happens at all**. The
+test is meaningless off-domain.
+
+So the harness is served from `testmerchant.fintelconnect.com`, via GitHub Pages with a
+custom domain. Two pieces:
+
+1. **DNS** — a `CNAME` record for `testmerchant.fintelconnect.com` pointing at
+   `tinasheadm.github.io`. This is the one step that needs whoever administers
+   fintelconnect.com DNS.
+2. **Repo** — the [`CNAME`](CNAME) file at the repo root, already committed, plus
+   *Settings → Pages → Custom domain* set to the same hostname. Tick **Enforce HTTPS**
+   once the certificate is issued.
+
+The `FC - Cookie Domain` GTM variable resolves `.fintelconnect.com` on any
+`*.fintelconnect.com` host and falls back to the exact hostname elsewhere, so the same
+tag works on the real domain, on localhost, and on the plain `github.io` URL — the last
+of which is useful for testing everything *except* attribution.
 
 ## Setting up GTM
 
@@ -78,19 +100,17 @@ not alter what the Fintel scripts do.
 
 ## Cookie domain — read this before you debug a "missing cookie"
 
-The production call scopes the cookie to `.fintelconnect.com`. A browser will not set a
-cookie for a domain the page is not served from, so on GitHub Pages or localhost that
-argument silently fails — and `.github.io` is a public suffix, which browsers refuse
-outright.
-
-The `FC - Cookie Domain` GTM variable resolves this per environment: `.fintelconnect.com`
-on production hosts, the exact hostname everywhere else. Same tag, no edits between
-environments. If you hardcode `.fintelconnect.com` while testing, expect no cookie.
+If the attribution tag fires but no cookie appears, check the hostname first. On
+`testmerchant.fintelconnect.com` the cookie is scoped to `.fintelconnect.com` and works.
+On any other host the `FC - Cookie Domain` variable falls back to that exact hostname, so
+a cookie is still set — but it is **not** a `.fintelconnect.com` cookie, and attribution
+against the real platform will not resolve. See the section above.
 
 ## Repo layout
 
 ```
 index.html  offers.html  apply.html  thank-you.html   the funnel
+CNAME                            custom domain for GitHub Pages
 assets/fc-test-harness.js    dataLayer, order IDs, network+cookie instrumentation
 assets/debug-panel.js        the on-page drawer
 assets/styles.css

@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Step 4 — Application submitted | FC GTM Test Harness</title>
+<meta name="robots" content="noindex, nofollow">
+<title>Application submitted | Fintel Connect</title>
 <link rel="stylesheet" href="assets/styles.css">
 <script src="assets/fc-test-harness.js"></script>
 
@@ -42,57 +43,98 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WFD2R889"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-<header class="topbar">
-  <strong>Generic Test Co.</strong>
-  <span class="env">GTM-WFD2R889 &middot; test harness</span>
-  <nav class="steps">
-    <a href="index.html">1 Landing</a>
-    <a href="offers.html">2 Offers</a>
-    <a href="apply.html">3 Apply</a>
-    <span class="now">4 Submitted</span>
-  </nav>
+<div class="envbar">
+  <div class="container">
+    <b>TEST ENVIRONMENT</b>
+    <span>Conversion page · pixel fires here · program 24490</span>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="container">
+    <a class="wordmark" href="index.html"><span class="mark">FC</span> Fintel&nbsp;Connect</a>
+    <span class="spacer"></span>
+    <span style="font-size:13.5px;color:var(--ink-faint)">Step 4 of 4</span>
+  </div>
 </header>
 
-<main class="wrap">
-  <div class="card">
-    <h1>Application submitted</h1>
-    <p class="lede">
-      The conversion page. This is where the Fintel pixel fires and creates the
-      record that gets attributed back to the publisher via the step 1 cookie.
-    </p>
+<nav class="rail">
+  <div class="container">
+    <ol>
+      <li class="done"><a href="index.html"><span class="n">✓</span> Landing</a></li>
+      <li class="done"><a href="offers.html"><span class="n">✓</span> Offers</a></li>
+      <li class="done"><a href="apply.html"><span class="n">✓</span> Apply</a></li>
+      <li class="on"><span class="n">4</span> Submitted</li>
+    </ol>
+  </div>
+</nav>
 
-    <div class="note tag">
-      <strong>What should fire here</strong>
+<section class="band plain" style="padding-top:30px">
+  <div class="container narrow">
+
+    <div class="success">
+      <span class="tick">✓</span>
+      <div>
+        <h1>Application submitted</h1>
+        <p>
+          Thanks — we've received your application. A confirmation has been sent to the
+          email address on file, and a decision usually follows within two business days.
+        </p>
+      </div>
+    </div>
+
+    <h3 style="font-size:18px;margin:0 0 12px">Your application details</h3>
+    <div class="receipt">
+      <div><span>Reference number</span><b id="r-oid">—</b></div>
+      <div><span>Product</span><b id="r-pid">—</b></div>
+      <div><span>Submitted</span><b id="r-time">—</b></div>
+      <div><span>Status</span><b>Received</b></div>
+    </div>
+
+    <div class="note">
+      <strong>What fires on this page</strong>
       GTM tag <code>FC – Conversion Pixel (Thank You)</code>, on the custom event
       <code>fc_application_submitted</code>. It loads <code>fcanalytics.js</code> and
-      calls <code>fcpixel.pxl(24490, orderId, pid, "", 0, 0, "", "testmerchantFC")</code>.
-      Fires once per page view — check the network list in the drawer for a duplicate.
+      calls <code>fcpixel.pxl(24490, orderID, pid, "", 0, 0, "", "testmerchantFC")</code>,
+      attributing the conversion using the cookie set on the landing page. It fires once
+      per page view — check the drawer's network list for a duplicate.
     </div>
 
-    <h2>Values handed to the pixel</h2>
+    <h3 style="font-size:18px;margin:30px 0 12px">Values handed to the pixel</h3>
     <div class="receipt">
       <div><span>Program ID</span><b>24490</b></div>
-      <div><span>orderID</span><b id="r-oid">—</b></div>
-      <div><span>pid</span><b id="r-pid">—</b></div>
+      <div><span>orderID</span><b id="r-oid2">—</b></div>
+      <div><span>pid</span><b id="r-pid2">—</b></div>
       <div><span>Merchant ref</span><b>testmerchantFC</b></div>
-      <div><span>Attribution cookie</span><b id="r-cookie">—</b></div>
+      <div><span>Attribution cookie</span><b id="r-cookie">checking…</b></div>
     </div>
 
-    <h2>Run it again</h2>
-    <p>
-      Use <em>Reset test</em> in the debug drawer to clear the cookie and order ID and
-      go back to step 1 — that gives you a clean attribution run rather than a repeat
+    <h3 style="font-size:18px;margin:30px 0 12px">Run it again</h3>
+    <p style="color:var(--ink-soft);font-size:15px">
+      Use <strong>Reset test</strong> in the debug drawer to clear the cookie and order
+      ID and return to step 1. That gives a clean attribution run rather than a repeat
       conversion on an existing cookie.
     </p>
-    <p>
-      <a class="btn btn-ghost" href="index.html">Back to landing (keep cookie)</a>
-    </p>
+    <a class="btn btn-ghost" href="index.html">Back to the landing page (keep cookie)</a>
   </div>
-</main>
+</section>
+
+<footer class="site">
+  <div class="container">
+    <div class="base">
+      Fintel Connect test harness — an internal environment for bot-detection and tag
+      measurement testing. Not a financial institution and not an offer of any product.
+    </div>
+  </div>
+</footer>
 
 <script>
-  document.getElementById('r-oid').textContent = window.__fcTestOrder.orderId;
-  document.getElementById('r-pid').textContent = window.__fcTestOrder.pid;
+  var order = window.__fcTestOrder;
+  document.getElementById('r-oid').textContent = order.orderId;
+  document.getElementById('r-oid2').textContent = order.orderId;
+  document.getElementById('r-pid').textContent = order.pid;
+  document.getElementById('r-pid2').textContent = order.pid;
+  document.getElementById('r-time').textContent = new Date().toLocaleString();
 
   // Give the GTM tags a moment to run before reporting on the cookie.
   setTimeout(function () {

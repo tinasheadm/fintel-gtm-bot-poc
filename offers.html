@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Step 2 — Offers | FC GTM Test Harness</title>
+<meta name="robots" content="noindex, nofollow">
+<title>Compare accounts | Fintel Connect</title>
 <link rel="stylesheet" href="assets/styles.css">
 <script src="assets/fc-test-harness.js"></script>
 
@@ -24,57 +25,118 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WFD2R889"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-<header class="topbar">
-  <strong>Generic Test Co.</strong>
-  <span class="env">GTM-WFD2R889 &middot; test harness</span>
-  <nav class="steps">
-    <a href="index.html">1 Landing</a>
-    <span class="now">2 Offers</span>
-    <span>3 Apply</span>
-    <span>4 Submitted</span>
-  </nav>
+<div class="envbar">
+  <div class="container">
+    <b>TEST ENVIRONMENT</b>
+    <span>Not a real product offer · GTM-WFD2R889 · merchant testmerchantFC</span>
+  </div>
+</div>
+
+<div class="utility">
+  <div class="container">
+    <a href="#">Find a branch</a>
+    <a href="#">Contact us</a>
+    <a href="#">Sign in</a>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="container">
+    <a class="wordmark" href="index.html"><span class="mark">FC</span> Fintel&nbsp;Connect</a>
+    <nav class="mainnav">
+      <a href="offers.html" aria-current="page">Bank accounts</a>
+      <a href="offers.html">Credit cards</a>
+      <a href="#">Mortgages</a>
+      <a href="#">Investing</a>
+    </nav>
+    <span class="spacer"></span>
+    <a class="btn btn-ghost" href="apply.html?pid=Rewards">Apply now</a>
+  </div>
 </header>
 
-<main class="wrap">
-  <div class="card">
-    <h1>Choose a product</h1>
-    <p class="lede">
-      A mid-funnel page. No Fintel tag fires here by design — it exists so the
-      attribution cookie has to survive a navigation before the pixel reads it.
+<nav class="rail">
+  <div class="container">
+    <ol>
+      <li class="done"><a href="index.html"><span class="n">✓</span> Landing</a></li>
+      <li class="on"><span class="n">2</span> Offers</li>
+      <li><span class="n">3</span> Apply</li>
+      <li><span class="n">4</span> Submitted</li>
+    </ol>
+  </div>
+</nav>
+
+<div class="container">
+  <p class="crumb"><a href="index.html">Home</a> › Compare accounts</p>
+</div>
+
+<section class="band plain" style="padding-top:26px">
+  <div class="container">
+    <h2 class="sec">Compare our accounts</h2>
+    <p class="sub">
+      Three products, each with a distinct product ID. The ID you pick here is the
+      <code>pid</code> value reported by the conversion pixel on the final step.
     </p>
 
-    <div class="note">
-      <strong>What to check</strong>
-      The Fintel cookie set on step 1 should still be listed in the debug drawer on
-      this page. If it is missing here, the cookie's domain or path is scoped too
-      narrowly.
-    </div>
-
-    <div class="offer">
+    <div class="product">
       <div>
-        <h3>Everyday Rewards Card</h3>
-        <p>Product ID <code>Rewards</code> — this is the one the pixel reports.</p>
+        <span class="pid">PID · REWARDS</span>
+        <h3>Everyday Rewards Account</h3>
+        <p>Unlimited transactions with points on every debit purchase. The default test product.</p>
+        <div class="meta">
+          <span>Monthly fee<b>$16.95</b></span>
+          <span>Welcome bonus<b>$450</b></span>
+          <span>Transactions<b>Unlimited</b></span>
+        </div>
       </div>
       <a class="btn" href="apply.html?pid=Rewards">Apply</a>
     </div>
 
-    <div class="offer">
+    <div class="product">
       <div>
-        <h3>Low Rate Card</h3>
-        <p>Product ID <code>LowRate</code> — use it to check the pixel's pid field.</p>
+        <span class="pid">PID · LOWRATE</span>
+        <h3>Low Rate Account</h3>
+        <p>Lower monthly fee, no rewards. Use it to confirm the pixel reports a different pid.</p>
+        <div class="meta">
+          <span>Monthly fee<b>$4.95</b></span>
+          <span>Welcome bonus<b>$100</b></span>
+          <span>Transactions<b>25/mo</b></span>
+        </div>
       </div>
       <a class="btn" href="apply.html?pid=LowRate">Apply</a>
     </div>
 
-    <div class="offer">
+    <div class="product">
       <div>
-        <h3>Secured Builder Card</h3>
-        <p>Product ID <code>Secured</code>.</p>
+        <span class="pid">PID · SECURED</span>
+        <h3>Secured Builder Account</h3>
+        <p>Deposit-backed account for building history. Third pid value for coverage.</p>
+        <div class="meta">
+          <span>Monthly fee<b>$9.95</b></span>
+          <span>Security deposit<b>$500</b></span>
+          <span>Transactions<b>12/mo</b></span>
+        </div>
       </div>
       <a class="btn" href="apply.html?pid=Secured">Apply</a>
     </div>
+
+    <div class="note" style="margin-top:28px">
+      <strong>No Fintel tag fires on this page — that is deliberate</strong>
+      This step forces the attribution cookie to survive a navigation before the pixel
+      reads it on the final page. Open the debug drawer and confirm the cookie set on
+      the landing page is still listed here. If it has disappeared, its domain or path
+      is scoped too narrowly.
+    </div>
   </div>
-</main>
+</section>
+
+<footer class="site">
+  <div class="container">
+    <div class="base">
+      Fintel Connect test harness — an internal environment for bot-detection and tag
+      measurement testing. Not a financial institution and not an offer of any product.
+    </div>
+  </div>
+</footer>
 
 <script src="assets/debug-panel.js"></script>
 </body>

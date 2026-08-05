@@ -12,8 +12,8 @@ conversion on an existing cookie.
 ## Baseline — the happy path
 
 1. Open the landing page **via the tracking link generated on the Fintel Connect
-   platform** — that link carries the `finteltag` click ID. The landing page's
-   *Inbound traffic* panel shows the value that actually arrived.
+   platform** — that link carries the `finteltag` click ID. The debug drawer's *Status*
+   section shows the value that arrived and confirms the host can scope the cookie.
 2. Drawer → **Cookies**: a Fintel cookie should be listed, carrying the publisher value.
 3. Drawer → **Fintel network calls**: a request to `cdn.fintelconnect.com`.
 4. Click through to offers → confirm the cookie is *still there* after navigating.
@@ -66,7 +66,7 @@ from playwright.sync_api import sync_playwright
 # Paste the publisher tracking link generated on the Fintel Connect platform — it
 # carries the finteltag click ID. Falling back to the bare landing page URL runs the
 # same flow as unattributed traffic.
-ENTRY = "https://tinasheadm.github.io/fintel-gtm-bot-poc/"
+ENTRY = "https://testmerchant.fintelconnect.com/"
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)      # try headless=False too
@@ -76,9 +76,10 @@ with sync_playwright() as p:
     page.wait_for_timeout(2000)
     print("cookies after landing:", page.context.cookies())
 
-    page.click("text=See offers")
-    page.click("text=Apply >> nth=0")
-    page.click("button[type=submit]")
+    # Selectors target hrefs rather than link text, so copy changes don't break the run.
+    page.click("section.band a[href='offers.html']")
+    page.click(".product a[href='apply.html?pid=Rewards']")
+    page.click("form#app-form button[type=submit]")
     page.wait_for_url("**/thank-you.html*")
     page.wait_for_timeout(2500)
 

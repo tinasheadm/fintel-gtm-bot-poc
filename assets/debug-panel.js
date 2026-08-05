@@ -72,6 +72,13 @@
         'fcpixel object': typeof window.fcpixel !== 'undefined' ? 'present' : 'not loaded on this page',
         'page': location.pathname.split('/').pop() || 'index.html',
         'hostname': location.hostname || '(file://)',
+        'attribution host': /(^|\.)fintelconnect\.com$/i.test(location.hostname)
+          ? 'yes — cookie scopes to .fintelconnect.com'
+          : 'NO — off-domain, cookie will not attribute',
+        'finteltag (click ID)':
+          new URLSearchParams(location.search).get('finteltag') ||
+          '(none — direct/unattributed visit)',
+        'referrer': document.referrer || '(none)',
         'order ID (session)': (function () {
           try { return sessionStorage.getItem('fc_test_order_id') || '(not yet generated)'; }
           catch (e) { return '(sessionStorage blocked)'; }

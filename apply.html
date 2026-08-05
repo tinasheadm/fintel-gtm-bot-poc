@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Step 3 — Application | FC GTM Test Harness</title>
+<meta name="robots" content="noindex, nofollow">
+<title>Application | Fintel Connect</title>
 <link rel="stylesheet" href="assets/styles.css">
 <script src="assets/fc-test-harness.js"></script>
 
@@ -28,81 +29,152 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WFD2R889"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-<header class="topbar">
-  <strong>Generic Test Co.</strong>
-  <span class="env">GTM-WFD2R889 &middot; test harness</span>
-  <nav class="steps">
-    <a href="index.html">1 Landing</a>
-    <a href="offers.html">2 Offers</a>
-    <span class="now">3 Apply</span>
-    <span>4 Submitted</span>
-  </nav>
+<div class="envbar">
+  <div class="container">
+    <b>TEST ENVIRONMENT</b>
+    <span>Dummy data only · nothing is submitted or stored</span>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="container">
+    <a class="wordmark" href="index.html"><span class="mark">FC</span> Fintel&nbsp;Connect</a>
+    <span class="spacer"></span>
+    <span style="font-size:13.5px;color:var(--ink-faint)">Secure application · Step 3 of 4</span>
+  </div>
 </header>
 
-<main class="wrap">
-  <div class="card">
-    <h1>Application</h1>
-    <p class="lede">
-      Dummy fields only — nothing is sent anywhere and nothing is stored beyond this
-      tab. Submitting generates the order ID and moves you to the thank-you page.
+<nav class="rail">
+  <div class="container">
+    <ol>
+      <li class="done"><a href="index.html"><span class="n">✓</span> Landing</a></li>
+      <li class="done"><a href="offers.html"><span class="n">✓</span> Offers</a></li>
+      <li class="on"><span class="n">3</span> Apply</li>
+      <li><span class="n">4</span> Submitted</li>
+    </ol>
+  </div>
+</nav>
+
+<section class="band plain" style="padding-top:30px">
+  <div class="container narrow">
+    <h2 class="sec">Open your account</h2>
+    <p class="sub">
+      Takes about ten minutes. The fields are prefilled with placeholder values for
+      testing.
     </p>
 
-    <div class="note">
+    <div class="note warn">
       <strong>Do not enter real personal data</strong>
-      This is a public test harness. The form is prefilled with obvious placeholders;
-      leave them as they are.
+      This is a public test harness. Nothing is transmitted or stored, but the repository
+      is public — leave the placeholder values as they are.
     </div>
 
-    <form id="app-form" novalidate>
-      <div class="row">
-        <div class="field">
-          <label for="fname">First name</label>
-          <input id="fname" name="fname" value="Test" autocomplete="off">
+    <form id="app-form" class="formcard" novalidate>
+      <fieldset>
+        <legend>About you</legend>
+        <div class="row">
+          <div class="field">
+            <label for="fname">First name</label>
+            <input id="fname" name="fname" value="Test" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="lname">Last name</label>
+            <input id="lname" name="lname" value="Applicant" autocomplete="off">
+          </div>
         </div>
         <div class="field">
-          <label for="lname">Last name</label>
-          <input id="lname" name="lname" value="Applicant" autocomplete="off">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email" value="test.applicant@example.com" autocomplete="off">
+          <p class="hint">We'll send your application reference here.</p>
         </div>
-      </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" value="test.applicant@example.com" autocomplete="off">
-      </div>
-      <div class="row">
-        <div class="field">
-          <label for="pid">Product (pid sent to the pixel)</label>
-          <select id="pid" name="pid">
-            <option>Rewards</option>
-            <option>LowRate</option>
-            <option>Secured</option>
-          </select>
+        <div class="row">
+          <div class="field">
+            <label for="phone">Phone <span class="opt">(optional)</span></label>
+            <input id="phone" name="phone" value="555-0100" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="dob">Date of birth</label>
+            <input id="dob" name="dob" value="1990-01-01" autocomplete="off">
+          </div>
         </div>
-        <div class="field">
-          <label for="income">Stated income</label>
-          <input id="income" name="income" value="60000" inputmode="numeric" autocomplete="off">
-        </div>
-      </div>
+      </fieldset>
 
-      <p style="margin-top:22px">
-        <button class="btn" type="submit">Submit application</button>
-        <a class="btn btn-ghost" href="offers.html">Back</a>
-      </p>
+      <fieldset>
+        <legend>Your address</legend>
+        <div class="field">
+          <label for="addr">Street address</label>
+          <input id="addr" name="addr" value="100 Test Street" autocomplete="off">
+        </div>
+        <div class="row-3">
+          <div class="field">
+            <label for="city">City</label>
+            <input id="city" name="city" value="Testville" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="prov">Province</label>
+            <select id="prov" name="prov">
+              <option>Ontario</option>
+              <option>British Columbia</option>
+              <option>Alberta</option>
+              <option>Quebec</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="post">Postal code</label>
+            <input id="post" name="post" value="A1A 1A1" autocomplete="off">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Product and income</legend>
+        <div class="row">
+          <div class="field">
+            <label for="pid">Account type</label>
+            <select id="pid" name="pid">
+              <option value="Rewards">Everyday Rewards Account</option>
+              <option value="LowRate">Low Rate Account</option>
+              <option value="Secured">Secured Builder Account</option>
+            </select>
+            <p class="hint">Sent to the conversion pixel as <code>pid</code>.</p>
+          </div>
+          <div class="field">
+            <label for="income">Annual income before tax</label>
+            <input id="income" name="income" value="60000" inputmode="numeric" autocomplete="off">
+          </div>
+        </div>
+        <div class="field check">
+          <input type="checkbox" id="terms" checked>
+          <label for="terms" style="font-weight:400">
+            I agree to the account terms and confirm the information provided is accurate.
+          </label>
+        </div>
+      </fieldset>
+
+      <button class="btn btn-block" type="submit">Submit application</button>
     </form>
 
-    <h2>Order ID for this session</h2>
-    <p>
+    <h3 style="font-size:18px;margin:34px 0 10px">Order ID for this session</h3>
+    <p style="color:var(--ink-soft);font-size:15px">
       Generated on submit and held in <code>sessionStorage</code>, then pushed to the
-      dataLayer on the thank-you page for the pixel tag to read. Regenerate it here if
-      you want a fresh one without restarting the flow.
+      dataLayer on the confirmation page for the pixel tag to read. Regenerate it here
+      to get a fresh one without restarting the flow.
     </p>
     <div class="receipt">
       <div><span>Current order ID</span><b id="oid">—</b></div>
     </div>
-    <p style="margin-top:12px">
-      <button class="btn btn-ghost" type="button" id="regen">Generate a new order ID</button>
-    </p>
+    <button class="btn btn-ghost" type="button" id="regen">Generate a new order ID</button>
   </div>
-</main>
+</section>
+
+<footer class="site">
+  <div class="container">
+    <div class="base">
+      Fintel Connect test harness — an internal environment for bot-detection and tag
+      measurement testing. Not a financial institution and not an offer of any product.
+    </div>
+  </div>
+</footer>
 
 <script>
   var oidOut = document.getElementById('oid');
@@ -132,7 +204,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     var pid = pidSelect.value;
 
     // Available to GTM in case anyone wants to fire on submit rather than on the
-    // thank-you page view.
+    // confirmation page view.
     FCTest.push('fc_application_submit', { orderId: orderId, pid: pid });
 
     location.href = 'thank-you.html?orderId=' + encodeURIComponent(orderId) +
