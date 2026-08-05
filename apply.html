@@ -12,7 +12,7 @@
   window.dataLayer.push({
     page_type: 'application',
     fc_merchant: 'testmerchantFC',
-    pid: new URLSearchParams(location.search).get('pid') || 'Rewards'
+    pid: FCTest.resolvePid()
   });
   FCTest.push('fc_application_start', {});
 </script>
@@ -133,11 +133,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <label for="pid">Account type</label>
             <select id="pid" name="pid">
               <option value="Rewards">Everyday Rewards Account</option>
-              <option value="YarBarProd">YarBarProd (product on ad 24749)</option>
               <option value="LowRate">Low Rate Account</option>
               <option value="Secured">Secured Builder Account</option>
             </select>
-            <p class="hint">Sent to the conversion pixel as <code>pid</code>.</p>
+            <p class="hint" id="pid-hint">Sent to the conversion pixel as <code>pid</code>.</p>
           </div>
           <div class="field">
             <label for="income">Annual income before tax</label>
@@ -190,19 +189,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     showOid();
   });
 
-  // Preselect the product chosen on the offers page.
-  var pidParam = new URLSearchParams(location.search).get('pid');
+  // The pid the pixel will report. If the Fintel ad supplied one via `mproduct`
+  // it wins outright — the dropdown is only for standalone testing, and nothing
+  // about the product is fixed in this harness.
   var pidSelect = document.getElementById('pid');
-  if (pidParam) {
-    Array.prototype.forEach.call(pidSelect.options, function (o) {
-      if (o.value === pidParam) pidSelect.value = pidParam;
+  var resolvedPid = FCTest.resolvePid();
+
+  if (resolvedPid) {
+    var known = Array.prototype.some.call(pidSelect.options, function (o) {
+      return o.value === resolvedPid;
     });
+    if (!known) {
+      // A product from the ad that isn't one of ours — add and select it.
+      var opt = document.createElement('option');
+      opt.value = resolvedPid;
+      opt.textContent = resolvedPid + ' (from the Fintel ad)';
+      pidSelect.insertBefore(opt, pidSelect.firstChild);
+    }
+    pidSelect.value = resolvedPid;
   }
+
+  if (FCTest.pidFromAd()) {
+    pidSelect.disabled = true;
+    document.getElementById('pid-hint').textContent =
+      'Set by the Fintel ad (mproduct=' + resolvedPid + '). Locked so the pixel ' +
+      'reports the product the ad points at.';
+  }
+
+  // Keep the stored pid in step with a manual change.
+  pidSelect.addEventListener('change', function () { FCTest.setPid(pidSelect.value, 'funnel'); });
 
   document.getElementById('app-form').addEventListener('submit', function (e) {
     e.preventDefault();
     var orderId = FCTest.getOrderId();     // created here if it does not exist yet
-    var pid = pidSelect.value;
+    var pid = FCTest.setPid(pidSelect.value, 'funnel');
 
     // Available to GTM in case anyone wants to fire on submit rather than on the
     // confirmation page view.

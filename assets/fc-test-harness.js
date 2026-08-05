@@ -21,6 +21,8 @@
   window.dataLayer = window.dataLayer || [];
 
   var STORAGE_KEY = 'fc_test_order_id';
+  var PID_KEY = 'fc_test_pid';
+  var PID_SRC_KEY = 'fc_test_pid_src';   // 'ad' | 'funnel'
   var LOG_KEY = 'fc_test_netlog';
   var WATCH = /fintelconnect\.com/i;
 
@@ -67,6 +69,62 @@
 
   FCTest.clearOrderId = function () {
     try { window.sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
+  };
+
+  // ---------------------------------------------------------------------------
+  // 1b. Product ID (pid)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * The pid reported by the conversion pixel is whatever product the Fintel ad
+   * points at, so nothing about it is fixed here. Resolution order:
+   *
+   *   1. `mproduct` on the landing URL — the platform's own product parameter.
+   *      Captured once and persisted, because it only appears on the first hop.
+   *   2. `pid` on the current URL — a product chosen inside the funnel.
+   *   3. Whatever was stored earlier this session.
+   *   4. Empty. The pixel tag does not invent one.
+   *
+   * The only value fixed anywhere in this harness is the program ID, 24490.
+   */
+  FCTest.resolvePid = function () {
+    var qs = new URLSearchParams(location.search);
+
+    var fromAd = qs.get('mproduct');
+    if (fromAd) return FCTest.setPid(fromAd, 'ad');
+
+    // An ad-sourced product is sticky for the rest of the session. Without this,
+    // an in-funnel link like apply.html?pid=Rewards would silently replace the
+    // product the ad actually pointed at.
+    if (FCTest.pidSource() === 'ad') return FCTest.getPid();
+
+    var fromUrl = qs.get('pid');
+    if (fromUrl) return FCTest.setPid(fromUrl, 'funnel');
+
+    return FCTest.getPid();
+  };
+
+  FCTest.getPid = function () {
+    try { return window.sessionStorage.getItem(PID_KEY) || ''; }
+    catch (e) { return ''; }
+  };
+
+  FCTest.pidSource = function () {
+    try { return window.sessionStorage.getItem(PID_SRC_KEY) || ''; }
+    catch (e) { return ''; }
+  };
+
+  FCTest.setPid = function (v, src) {
+    try {
+      window.sessionStorage.setItem(PID_KEY, v);
+      if (src) window.sessionStorage.setItem(PID_SRC_KEY, src);
+    } catch (e) {}
+    return v;
+  };
+
+  /** True when the current pid came from the Fintel ad, not a funnel selection. */
+  FCTest.pidFromAd = function () {
+    return FCTest.pidSource() === 'ad';
   };
 
   // ---------------------------------------------------------------------------
@@ -238,6 +296,10 @@
   FCTest.resetAll = function () {
     FCTest.clearCookies();
     FCTest.clearOrderId();
+    try {
+      window.sessionStorage.removeItem(PID_KEY);
+      window.sessionStorage.removeItem(PID_SRC_KEY);
+    } catch (e) {}
     try { window.sessionStorage.removeItem(LOG_KEY); } catch (e) {}
     location.href = 'index.html';
   };

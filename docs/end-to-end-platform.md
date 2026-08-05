@@ -247,9 +247,28 @@ The platform also drops its own `HttpOnly; Secure` cookies on `api.fintelconnect
 during the redirect. Those are separate from the first-party `FcAtrId` cookie our
 attribution tag writes on the landing page host — don't confuse the two when debugging.
 
-`pid` remains the merchant's own product label. The ad is configured with product
-`YarBarProd`, so that value is now selectable in the harness alongside the generic ones;
-use it for platform end-to-end runs so the pixel reports what the ad expects.
+## `pid` is never hardcoded
+
+The product an ad points at changes, so no product name is fixed anywhere in this
+harness or in the GTM tags. **`24490` is the only constant.** The pid is resolved per
+session, in this order:
+
+1. **`mproduct` on the landing URL** — the platform's own product parameter. It appears
+   only on the first hop, so it is captured there and persisted for the session.
+2. **An ad-sourced product is sticky.** Once step 1 has fired, an in-funnel link such as
+   `apply.html?pid=Rewards` cannot replace it. Without that rule the harness's own
+   navigation would silently overwrite the product the ad actually pointed at.
+3. **`pid` on the current URL** — a product chosen inside the funnel, when no ad supplied
+   one.
+4. **Empty.** The pixel tag does not substitute a default; it reports an empty product
+   and logs a console warning. Inventing a product would be worse than reporting none.
+
+On the application page, a product that came from the ad is shown and locked, with the
+dropdown disabled — the generic products exist only for standalone tag testing.
+
+Verified across three journeys: an ad carrying `mproduct` (product survives the whole
+funnel including a deliberate clobber attempt), an ad without one (funnel selection is
+used), and a direct visit (stays empty).
 
 ## The attribution library fingerprints the device
 

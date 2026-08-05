@@ -16,7 +16,7 @@
   (function () {
     var qs = new URLSearchParams(location.search);
     var orderId = qs.get('orderId') || FCTest.getOrderId();
-    var pid = qs.get('pid') || 'Rewards';
+    var pid = FCTest.resolvePid();   // ad's mproduct > funnel selection > stored
 
     window.dataLayer.push({ page_type: 'thank_you', fc_merchant: 'testmerchantFC' });
 

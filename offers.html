@@ -10,7 +10,7 @@
 
 <script>
   window.dataLayer.push({ page_type: 'offers', fc_merchant: 'testmerchantFC' });
-  FCTest.push('fc_offer_view', { offer_count: 4 });
+  FCTest.push('fc_offer_view', { offer_count: 3 });
 </script>
 
 <!-- Google Tag Manager -->
@@ -50,7 +50,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <a href="#">Investing</a>
     </nav>
     <span class="spacer"></span>
-    <a class="btn btn-ghost" href="apply.html?pid=Rewards">Apply now</a>
+    <a class="btn btn-ghost" href="apply.html">Apply now</a>
   </div>
 </header>
 
@@ -74,8 +74,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <h2 class="sec">Compare our accounts</h2>
     <p class="sub">
       Each product has a distinct product ID. The one you pick here is the
-      <code>pid</code> value reported by the conversion pixel on the final step — use
-      <strong>YarBar</strong> for platform end-to-end runs so it matches the ad.
+      <code>pid</code> value reported by the conversion pixel — unless the Fintel ad
+      supplied a product on the landing URL, in which case that wins and these are
+      ignored.
     </p>
 
     <div class="product">
@@ -118,21 +119,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
       </div>
       <a class="btn" href="apply.html?pid=Secured">Apply</a>
-    </div>
-
-    <div class="product">
-      <div>
-        <span class="pid">PID · YARBARPROD</span>
-        <h3>YarBar Account</h3>
-        <p>Matches the product configured on Fintel ad 24749 — use this one when running
-           the full platform end-to-end test so <code>pid</code> lines up.</p>
-        <div class="meta">
-          <span>Monthly fee<b>$0.00</b></span>
-          <span>Welcome bonus<b>&mdash;</b></span>
-          <span>Purpose<b>Platform e2e</b></span>
-        </div>
-      </div>
-      <a class="btn" href="apply.html?pid=YarBarProd">Apply</a>
     </div>
 
     <div class="note" style="margin-top:28px">

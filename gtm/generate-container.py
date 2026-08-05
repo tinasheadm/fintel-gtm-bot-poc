@@ -70,8 +70,14 @@ PIXEL_HTML = r"""<script>
     return v;
   }
 
+  // Program ID is the only fixed value here. The order ID is generated if the tag
+  // is fired outside the funnel, but the product is NOT invented — it belongs to
+  // whatever the Fintel ad points at, so an empty pid is reported as empty.
   var orderID = clean("{{DLV - orderId}}", generateOrderId());
-  var pid     = clean("{{DLV - pid}}", "Rewards");
+  var pid     = clean("{{DLV - pid}}", "");
+  if (pid === "" && window.console) {
+    console.warn("[GTM][FC] no pid in the dataLayer — reporting an empty product");
+  }
 
   function run() {
     if (!window.fcpixel || typeof window.fcpixel.pxl !== "function") {

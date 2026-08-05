@@ -17,9 +17,12 @@
     page_type: 'landing',
     fc_merchant: 'testmerchantFC'
   });
+  // The ad's product arrives as `mproduct` on this first hop only, so capture it
+  // here and let it ride through the funnel. Nothing about the product is fixed.
   FCTest.push('fc_landing_view', {
     landing_url: location.href,
-    fc_click_id: new URLSearchParams(location.search).get('finteltag') || null
+    fc_click_id: new URLSearchParams(location.search).get('finteltag') || null,
+    pid: FCTest.resolvePid() || null
   });
 </script>
 
@@ -86,7 +89,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         Everyday banking with unlimited transactions, no monthly fee for the first
         year, and a welcome bonus when you set up two eligible direct deposits.
       </p>
-      <a class="btn btn-light" href="apply.html?pid=Rewards">Open an account</a>
+      <a class="btn btn-light" href="apply.html">Open an account</a>
       <p class="fine">
         Offer ends 31 December. Conditions apply.<sup>1</sup>
         <a href="#legal">See full terms</a>
@@ -103,7 +106,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <li>First-year monthly fee waived ($16.95 value)</li>
         <li>Unlimited debit transactions</li>
       </ul>
-      <a class="btn btn-block" href="apply.html?pid=Rewards">Apply online in 10 minutes</a>
+      <a class="btn btn-block" href="apply.html">Apply online in 10 minutes</a>
     </aside>
   </div>
 </section>
@@ -164,7 +167,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       Nothing you enter in this test environment is stored or transmitted.
     </p>
     <a class="btn" href="offers.html">Compare all accounts</a>
-    <a class="btn btn-ghost" href="apply.html?pid=Rewards">Start application</a>
+    <a class="btn btn-ghost" href="apply.html">Start application</a>
   </div>
 </section>
 
