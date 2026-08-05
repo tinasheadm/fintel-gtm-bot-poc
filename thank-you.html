@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Step 4 — Application submitted | FC GTM Test Harness</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="assets/fc-test-harness.js"></script>
+
+<!-- The conversion event. Pushed before the GTM snippet so orderId and pid are
+     already in the dataLayer when GTM initialises and the pixel tag's Data Layer
+     Variables resolve. Falling back to the query string keeps a hard refresh or a
+     directly-pasted URL working. -->
+<script>
+  (function () {
+    var qs = new URLSearchParams(location.search);
+    var orderId = qs.get('orderId') || FCTest.getOrderId();
+    var pid = qs.get('pid') || 'Rewards';
+
+    window.dataLayer.push({ page_type: 'thank_you', fc_merchant: 'testmerchantFC' });
+
+    FCTest.push('fc_application_submitted', {
+      orderId: orderId,
+      pid: pid,
+      merchantRef: 'testmerchantFC',
+      programId: 24490
+    });
+
+    window.__fcTestOrder = { orderId: orderId, pid: pid };
+  })();
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WFD2R889');</script>
+<!-- End Google Tag Manager -->
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WFD2R889"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<header class="topbar">
+  <strong>Generic Test Co.</strong>
+  <span class="env">GTM-WFD2R889 &middot; test harness</span>
+  <nav class="steps">
+    <a href="index.html">1 Landing</a>
+    <a href="offers.html">2 Offers</a>
+    <a href="apply.html">3 Apply</a>
+    <span class="now">4 Submitted</span>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="card">
+    <h1>Application submitted</h1>
+    <p class="lede">
+      The conversion page. This is where the Fintel pixel fires and creates the
+      record that gets attributed back to the publisher via the step 1 cookie.
+    </p>
+
+    <div class="note tag">
+      <strong>What should fire here</strong>
+      GTM tag <code>FC – Conversion Pixel (Thank You)</code>, on the custom event
+      <code>fc_application_submitted</code>. It loads <code>fcanalytics.js</code> and
+      calls <code>fcpixel.pxl(24490, orderId, pid, "", 0, 0, "", "testmerchantFC")</code>.
+      Fires once per page view — check the network list in the drawer for a duplicate.
+    </div>
+
+    <h2>Values handed to the pixel</h2>
+    <div class="receipt">
+      <div><span>Program ID</span><b>24490</b></div>
+      <div><span>orderID</span><b id="r-oid">—</b></div>
+      <div><span>pid</span><b id="r-pid">—</b></div>
+      <div><span>Merchant ref</span><b>testmerchantFC</b></div>
+      <div><span>Attribution cookie</span><b id="r-cookie">—</b></div>
+    </div>
+
+    <h2>Run it again</h2>
+    <p>
+      Use <em>Reset test</em> in the debug drawer to clear the cookie and order ID and
+      go back to step 1 — that gives you a clean attribution run rather than a repeat
+      conversion on an existing cookie.
+    </p>
+    <p>
+      <a class="btn btn-ghost" href="index.html">Back to landing (keep cookie)</a>
+    </p>
+  </div>
+</main>
+
+<script>
+  document.getElementById('r-oid').textContent = window.__fcTestOrder.orderId;
+  document.getElementById('r-pid').textContent = window.__fcTestOrder.pid;
+
+  // Give the GTM tags a moment to run before reporting on the cookie.
+  setTimeout(function () {
+    var fc = FCTest.fcCookies();
+    document.getElementById('r-cookie').textContent = fc.length
+      ? fc.map(function (c) { return c.name; }).join(', ')
+      : 'none found — see debug drawer';
+  }, 1200);
+</script>
+<script src="assets/debug-panel.js"></script>
+</body>
+</html>

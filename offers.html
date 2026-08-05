@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Step 2 — Offers | FC GTM Test Harness</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="assets/fc-test-harness.js"></script>
+
+<script>
+  window.dataLayer.push({ page_type: 'offers', fc_merchant: 'testmerchantFC' });
+  FCTest.push('fc_offer_view', { offer_count: 3 });
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WFD2R889');</script>
+<!-- End Google Tag Manager -->
+</head>
+<body>
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WFD2R889"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<header class="topbar">
+  <strong>Generic Test Co.</strong>
+  <span class="env">GTM-WFD2R889 &middot; test harness</span>
+  <nav class="steps">
+    <a href="index.html">1 Landing</a>
+    <span class="now">2 Offers</span>
+    <span>3 Apply</span>
+    <span>4 Submitted</span>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="card">
+    <h1>Choose a product</h1>
+    <p class="lede">
+      A mid-funnel page. No Fintel tag fires here by design — it exists so the
+      attribution cookie has to survive a navigation before the pixel reads it.
+    </p>
+
+    <div class="note">
+      <strong>What to check</strong>
+      The Fintel cookie set on step 1 should still be listed in the debug drawer on
+      this page. If it is missing here, the cookie's domain or path is scoped too
+      narrowly.
+    </div>
+
+    <div class="offer">
+      <div>
+        <h3>Everyday Rewards Card</h3>
+        <p>Product ID <code>Rewards</code> — this is the one the pixel reports.</p>
+      </div>
+      <a class="btn" href="apply.html?pid=Rewards">Apply</a>
+    </div>
+
+    <div class="offer">
+      <div>
+        <h3>Low Rate Card</h3>
+        <p>Product ID <code>LowRate</code> — use it to check the pixel's pid field.</p>
+      </div>
+      <a class="btn" href="apply.html?pid=LowRate">Apply</a>
+    </div>
+
+    <div class="offer">
+      <div>
+        <h3>Secured Builder Card</h3>
+        <p>Product ID <code>Secured</code>.</p>
+      </div>
+      <a class="btn" href="apply.html?pid=Secured">Apply</a>
+    </div>
+  </div>
+</main>
+
+<script src="assets/debug-panel.js"></script>
+</body>
+</html>
