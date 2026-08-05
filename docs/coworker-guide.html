@@ -16,6 +16,8 @@
     --fail-bg:    #f8e8e6;
     --warn-bg:    #fdf3e3;
     --warn-rule:  #d9a441;
+    --pend:       #7a5410;
+    --pend-bg:    #fdf3e3;
     --code-bg:    #f0f4f5;
 
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, "Cascadia Mono", Consolas, monospace;
@@ -41,6 +43,8 @@
       --fail-bg:   #2b1614;
       --warn-bg:   #2a2113;
       --warn-rule: #b98a34;
+      --pend:      #d9ab5c;
+      --pend-bg:   #2a2113;
       --code-bg:   #101a1d;
     }
   }
@@ -49,14 +53,14 @@
     --ink-faint:#6f838b; --rule:#26343a; --rule-soft:#1d282d;
     --accent:#4fb3ab; --accent-bg:#102b2b; --pass:#6cc79b; --pass-bg:#10281f;
     --fail:#e8938a; --fail-bg:#2b1614; --warn-bg:#2a2113; --warn-rule:#b98a34;
-    --code-bg:#101a1d;
+    --pend:#d9ab5c; --pend-bg:#2a2113; --code-bg:#101a1d;
   }
   :root[data-theme="light"] {
     --paper:#f7f9fa; --card:#ffffff; --ink:#121a1e; --ink-soft:#4a5a61;
     --ink-faint:#7a8b93; --rule:#dde5e8; --rule-soft:#e9eff1;
     --accent:#0d6a6a; --accent-bg:#e6f2f2; --pass:#16704a; --pass-bg:#e4f2eb;
     --fail:#9a2f28; --fail-bg:#f8e8e6; --warn-bg:#fdf3e3; --warn-rule:#d9a441;
-    --code-bg:#f0f4f5;
+    --pend:#7a5410; --pend-bg:#fdf3e3; --code-bg:#f0f4f5;
   }
 
   * { box-sizing: border-box; }
@@ -285,6 +289,13 @@
   }
   .chip.yes { background: var(--pass-bg); color: var(--pass); }
   .chip.no  { background: var(--fail-bg); color: var(--fail); }
+  .chip.pending {
+    background: var(--pend-bg);
+    color: var(--pend);
+    border: 1px solid currentColor;
+    margin-left: 4px;
+    vertical-align: 1px;
+  }
 
   .perms { list-style: none; padding: 0; max-width: var(--measure); }
   .perms li {
@@ -337,6 +348,8 @@
       --fail-bg:   #ffffff;
       --warn-bg:   #ffffff;
       --warn-rule: #8a6413;
+      --pend:      #614009;
+      --pend-bg:   #ffffff;
       --code-bg:   #ffffff;
     }
 
@@ -395,9 +408,15 @@
 
 <dl class="facts">
   <dt>Landing page</dt>
-  <dd><a href="https://tinasheadm.github.io/fintel-gtm-bot-poc/">https://tinasheadm.github.io/fintel-gtm-bot-poc/</a></dd>
+  <dd>
+    <a href="https://tinasheadm.github.io/fintel-gtm-bot-poc/">https://tinasheadm.github.io/fintel-gtm-bot-poc/</a>
+    <span class="chip pending">not live yet</span>
+  </dd>
   <dt>Source code</dt>
-  <dd><a href="https://github.com/tinasheadm/fintel-gtm-bot-poc">https://github.com/tinasheadm/fintel-gtm-bot-poc</a></dd>
+  <dd>
+    <a href="https://github.com/tinasheadm/fintel-gtm-bot-poc">https://github.com/tinasheadm/fintel-gtm-bot-poc</a>
+    <span class="chip pending">not live yet</span>
+  </dd>
   <dt>GTM container</dt>
   <dd>GTM-WFD2R889</dd>
   <dt>Merchant ref</dt>
@@ -405,6 +424,17 @@
   <dt>Program ID</dt>
   <dd>24490</dd>
 </dl>
+
+<div class="callout alert">
+  <span class="label">Both links 404 right now</span>
+  <p>
+    The repository hasn't been pushed to GitHub yet, so the source code URL returns a
+    404 and GitHub Pages has nothing to serve at the landing page URL. Those are the
+    addresses both will have — they start working once the repo is pushed and Pages is
+    enabled. <strong>If you're reading this and the links are dead, that's why; nothing
+    is broken at your end.</strong>
+  </p>
+</div>
 
 <div class="callout">
   <span class="label">The point of this</span>

@@ -9,13 +9,19 @@ Custom HTML tag and is injected into the page at runtime. That indirection is th
 being tested — how our scripts behave when a client fires them from a GTM container
 rather than hardcoding them.
 
-| | |
-|---|---|
-| Landing page | <https://tinasheadm.github.io/fintel-gtm-bot-poc/> |
-| Source code | <https://github.com/tinasheadm/fintel-gtm-bot-poc> |
-| GTM container | `GTM-WFD2R889` |
-| Merchant ref | `testmerchantFC` |
-| Fintel program ID | `24490` |
+| | | |
+|---|---|---|
+| Landing page | <https://tinasheadm.github.io/fintel-gtm-bot-poc/> | ⏳ not live yet |
+| Source code | <https://github.com/tinasheadm/fintel-gtm-bot-poc> | ⏳ not live yet |
+| GTM container | `GTM-WFD2R889` | |
+| Merchant ref | `testmerchantFC` | |
+| Fintel program ID | `24490` | |
+
+> **Both links 404 right now.** The repository hasn't been pushed to GitHub yet, so the
+> source code URL returns a 404 and GitHub Pages has nothing to serve at the landing
+> page URL. Those are the addresses both will have — they start working once the repo is
+> pushed and Pages is enabled. If you're reading this and the links are dead, that's
+> why; nothing is broken at your end.
 
 ---
 
