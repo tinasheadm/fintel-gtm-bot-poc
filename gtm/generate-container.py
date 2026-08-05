@@ -106,15 +106,17 @@ COOKIE_DOMAIN_JS = r"""function () {
    * from, so this cannot be a literal — the harness runs on three kinds of host and
    * the correct value differs on each:
    *
-   *   *.fctest.com        -> ".fctest.com"        dev testing (via /etc/hosts)
+   *   *.fctest.test       -> ".fctest.test"       local dev (via /etc/hosts)
    *   *.fintelconnect.com -> ".fintelconnect.com" production
-   *   anything else       -> the exact hostname   localhost, github.io, staging
+   *   anything else       -> the exact hostname   github.io, localhost, staging
    *
-   * The fallback still writes a cookie so the rest of the flow stays testable, but
-   * it is host-scoped and will not attribute on the Fintel platform.
+   * The fallback is host-scoped rather than domain-scoped. For this funnel that is
+   * still a working first-party cookie — every page is on one host, and the pixel
+   * reads the cookie client-side on that same host. The domain attribute only
+   * becomes load-bearing if the funnel ever spans subdomains.
    */
   var host = document.location.hostname || "";
-  if (/(^|\.)fctest\.com$/i.test(host)) return ".fctest.com";
+  if (/(^|\.)fctest\.test$/i.test(host)) return ".fctest.test";
   if (/(^|\.)fintelconnect\.com$/i.test(host)) return ".fintelconnect.com";
   return host;
 }"""

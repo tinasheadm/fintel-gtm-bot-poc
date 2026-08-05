@@ -407,10 +407,15 @@
 </header>
 
 <dl class="facts">
-  <dt>Landing page</dt>
+  <dt>Local dev</dt>
   <dd>
-    http://www.fctest.com:8000/
-    <span class="chip yes">run locally</span>
+    http://www.fctest.test:8000/
+    <span class="chip yes">no DNS needed</span>
+  </dd>
+  <dt>Platform e2e</dt>
+  <dd>
+    <a href="https://tinasheadm.github.io/fintel-gtm-bot-poc/">https://tinasheadm.github.io/fintel-gtm-bot-poc/</a>
+    <span class="chip pending">enable Pages</span>
   </dd>
   <dt>Source code</dt>
   <dd>
@@ -425,20 +430,23 @@
 </dl>
 
 <div class="callout alert">
-  <span class="label">There is no hosted copy — you run it locally</span>
+  <span class="label">Two hosts, and they are not interchangeable</span>
   <p>
-    The dev test domain is <code>.fctest.com</code>, set up with a one-line
-    <code>/etc/hosts</code> entry on your own machine. No DNS administrator, no hosting,
-    about a minute:
+    <strong>Local dev</strong> runs on <code>www.fctest.test</code> via a one-line
+    <code>/etc/hosts</code> entry — no DNS administrator, about a minute per machine:
   </p>
-<pre><code>echo '127.0.0.1 www.fctest.com testmerchant.fctest.com' | sudo tee -a /etc/hosts
-./serve.sh</code></pre>
+<pre><code>echo '127.0.0.1 www.fctest.test testmerchant.fctest.test' | sudo tee -a /etc/hosts
+python3 serve.py</code></pre>
   <p>
-    Then open <code>http://www.fctest.com:8000/</code>.
-    <strong>Use that hostname, not <code>localhost</code>.</strong> A
-    <code>.fctest.com</code> cookie cannot be set from any other host, and the failure is
-    silent — the tag appears to fire cleanly and no cookie exists. Full detail in
-    <code>docs/local-domain-setup.md</code>.
+    <strong>Platform end-to-end</strong> needs a publicly reachable URL, because Fintel
+    has to be able to fetch the landing page to generate a working tracking link.
+    <code>.test</code> is reserved by RFC 6761 and never resolves on the public
+    internet — that is exactly what makes it safe locally, and exactly why the platform
+    cannot use it. Use the GitHub Pages URL for that.
+  </p>
+  <p>
+    Both serve the identical build from the same repo. Full comparison in
+    <code>docs/end-to-end-platform.md</code>.
   </p>
 </div>
 
@@ -533,7 +541,7 @@
   <h3>Step 1 — attribution, on the landing page</h3>
   <p>Creates the first-party cookie holding the publisher's information.</p>
 <pre><code><span class="cmt">// library: https://cdn.fintelconnect.com/scripts/fcanalytics/v1.js</span>
-fcpixel.attribution("finteltag", 10, "last", "testmerchantFC", ".fctest.com");
+fcpixel.attribution("finteltag", 10, "last", "testmerchantFC", ".fctest.test");
 <span class="cmt">//                  query param  days  model   merchant ref</span></code></pre>
 
   <h3>Step 2 — conversion pixel, on the thank-you page</h3>
@@ -568,13 +576,14 @@ document.head.appendChild(s);</code></pre>
   <h4>The cookie domain resolves per environment</h4>
   <p>
     A browser only accepts a cookie scoped to a domain the page is actually served from,
-    so the correct value differs by host — <code>.fctest.com</code> for dev testing,
-    <code>.fintelconnect.com</code> in production. Hardcoding either one breaks the
-    other. So the tag reads a GTM variable rather than a literal:
+    so the correct value differs by host — <code>.fctest.test</code> for local dev,
+    the bare hostname on GitHub Pages, <code>.fintelconnect.com</code> in production.
+    Hardcoding any one of them breaks the others. So the tag reads a GTM variable
+    rather than a literal:
   </p>
 <pre><code>function () {
   var host = document.location.hostname || "";
-  if (/(^|\.)fctest\.com$/i.test(host)) return ".fctest.com";
+  if (/(^|\.)fctest\.test$/i.test(host)) return ".fctest.test";
   if (/(^|\.)fintelconnect\.com$/i.test(host)) return ".fintelconnect.com";
   return host;   <span class="cmt">// localhost, github.io — host-scoped, will not attribute</span>
 }</code></pre>
@@ -586,7 +595,7 @@ document.head.appendChild(s);</code></pre>
       conversion didn't attribute, <strong>check the hostname first</strong> — the debug
       drawer's Status section says directly whether the current host can scope the
       cookie. The usual answer is that the page was opened on <code>localhost</code>
-      instead of <code>www.fctest.com</code>.
+      instead of <code>www.fctest.test</code>.
     </p>
   </div>
 </section>

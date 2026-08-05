@@ -3,8 +3,8 @@
 Scenarios for exercising the Fintel tags through GTM. Every one of them can be verified
 from the on-page debug drawer (`d`) plus GTM Preview.
 
-Serve the harness with `./serve.sh` and use **http://www.fctest.com:8000/** — not
-`localhost`. A `.fctest.com` cookie cannot be set from any other hostname; see
+Serve the harness with `./serve.sh` and use **http://www.fctest.test:8000/** — not
+`localhost`. A `.fctest.test` cookie cannot be set from any other hostname; see
 [local-domain-setup.md](local-domain-setup.md).
 
 Before each run: **Reset test** in the drawer. It clears cookies and the stored order
@@ -70,7 +70,7 @@ from playwright.sync_api import sync_playwright
 # Paste the publisher tracking link generated on the Fintel Connect platform — it
 # carries the finteltag click ID. Falling back to the bare landing page URL runs the
 # same flow as unattributed traffic.
-ENTRY = "http://www.fctest.com:8000/"
+ENTRY = "http://www.fctest.test:8000/"
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)      # try headless=False too

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Serve the harness on a *.fctest.com hostname so the attribution cookie can be
-scoped to .fctest.com.
+Serve the harness on a *.fctest.test hostname so the attribution cookie can be
+scoped to .fctest.test.
 
 Cross-platform (macOS, Linux, Windows) — use this rather than serve.sh unless you
 are on a Unix shell and prefer the shell script. Standard library only.
@@ -10,10 +10,12 @@ are on a Unix shell and prefer the shell script. Standard library only.
     python3 serve.py 8080
 
 Before it will serve, it checks that the test hostname actually resolves to this
-machine. That check matters: fctest.com is a real registered domain owned by
-someone else. If the hosts entry is missing or is being bypassed, the browser
-does not show an error — it quietly loads a stranger's website instead of the
-harness, which is a confusing way to lose an afternoon.
+machine, so nobody spends an afternoon testing a build whose cookies silently
+vanish.
+
+The .test TLD is reserved by RFC 6761 and can never be registered by anyone, so
+there is no real site behind this name and no risk of a stray request escaping
+to a third party. Without the hosts entry the name simply does not resolve.
 """
 
 import http.server
@@ -23,8 +25,8 @@ import socket
 import socketserver
 import sys
 
-HOSTNAME = "www.fctest.com"
-ALT_HOSTNAME = "testmerchant.fctest.com"
+HOSTNAME = "www.fctest.test"
+ALT_HOSTNAME = "testmerchant.fctest.test"
 HOSTS_LINE = f"127.0.0.1 {HOSTNAME} {ALT_HOSTNAME}"
 LOOPBACK = {"127.0.0.1", "::1"}
 
@@ -48,10 +50,10 @@ def resolves_to_loopback(host):
 
 def instructions():
     print(f"\n  {HOSTNAME} does not point at this machine.\n")
-    print("  The attribution cookie is scoped to .fctest.com, and a browser only")
+    print("  The attribution cookie is scoped to .fctest.test, and a browser only")
     print("  accepts a cookie scoped to a domain the page is really served from.")
-    print("  Without this mapping the cookie is silently discarded — or worse, your")
-    print("  browser loads the real fctest.com, which belongs to someone else.\n")
+    print("  Without this mapping the name does not resolve at all, and the")
+    print("  .fctest.test cookie can never be set.\n")
     print(f"  Add this line to {HOSTS_PATH}:\n")
     print(f"      {HOSTS_LINE}\n")
     if IS_WINDOWS:
@@ -93,7 +95,7 @@ def main():
     print()
     print(f"  Serving       {os.getcwd()}")
     print(f"  Landing page  http://{HOSTNAME}:{port}/")
-    print(f"  Cookie domain .fctest.com  ({HOSTNAME} -> {detail})")
+    print(f"  Cookie domain .fctest.test  ({HOSTNAME} -> {detail})")
     print("  Ctrl-C to stop.")
     print()
 

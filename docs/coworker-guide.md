@@ -11,23 +11,23 @@ rather than hardcoding them.
 
 | | | |
 |---|---|---|
-| Landing page | `http://www.fctest.com:8000/` (run locally) | ✅ no DNS needed |
+| Landing page | `http://www.fctest.test:8000/` (run locally) | ✅ no DNS needed |
 | Source code | <https://github.com/tinasheadm/fintel-gtm-bot-poc> | ✅ live |
 | GTM container | `GTM-WFD2R889` | |
 | Merchant ref | `testmerchantFC` | |
 | Fintel program ID | `24490` | |
 
 > **There is no hosted copy — you run it locally.** The dev test domain is
-> `.fctest.com`, set up with a one-line `/etc/hosts` entry on your own machine. No DNS
+> `.fctest.test`, set up with a one-line `/etc/hosts` entry on your own machine. No DNS
 > administrator, no hosting, about a minute:
 >
 > ```bash
-> echo '127.0.0.1 www.fctest.com testmerchant.fctest.com' | sudo tee -a /etc/hosts
+> echo '127.0.0.1 www.fctest.test testmerchant.fctest.test' | sudo tee -a /etc/hosts
 > ./serve.sh
 > ```
 >
-> Then open `http://www.fctest.com:8000/`. **Use that hostname, not `localhost`** — a
-> `.fctest.com` cookie cannot be set from any other host, and the failure is silent.
+> Then open `http://www.fctest.test:8000/`. **Use that hostname, not `localhost`** — a
+> `.fctest.test` cookie cannot be set from any other host, and the failure is silent.
 > Full detail in `docs/local-domain-setup.md`.
 
 ---
@@ -109,13 +109,13 @@ uncaught `fcpixel is not defined`.
 
 **2. The cookie domain is resolved per environment.** A browser only accepts a cookie
 scoped to a domain the page is actually served from, so the correct value differs by
-host — `.fctest.com` for dev testing, `.fintelconnect.com` in production. Hardcoding
+host — `.fctest.test` for dev testing, `.fintelconnect.com` in production. Hardcoding
 either one breaks the other. So the tag reads a GTM variable rather than a literal:
 
 ```js
 function () {
   var host = document.location.hostname || "";
-  if (/(^|\.)fctest\.com$/i.test(host)) return ".fctest.com";
+  if (/(^|\.)fctest\.test$/i.test(host)) return ".fctest.test";
   if (/(^|\.)fintelconnect\.com$/i.test(host)) return ".fintelconnect.com";
   return host;   // localhost, github.io — host-scoped, will not attribute
 }

@@ -1,6 +1,11 @@
-# Testing on .fctest.com without DNS
+# Testing on .fctest.test without DNS
 
-The dev-team test domain is **`.fctest.com`**. Every developer sets it up on their own
+> **This setup is for local development only.** `.test` never resolves on the public
+> internet, so the Fintel Connect platform cannot reach it and a publisher tracking link
+> pointing here will fail for everyone. For end-to-end testing through the platform, see
+> [end-to-end-platform.md](end-to-end-platform.md).
+
+The dev-team test domain is **`.fctest.test`**. Every developer sets it up on their own
 machine in about a minute. No DNS administrator, no hosting, no certificate.
 
 ## Why a hosts entry rather than a real domain
@@ -8,30 +13,32 @@ machine in about a minute. No DNS administrator, no hosting, no certificate.
 The attribution call ends with a cookie domain:
 
 ```js
-fcpixel.attribution("finteltag", 10, "last", "testmerchantFC", ".fctest.com");
+fcpixel.attribution("finteltag", 10, "last", "testmerchantFC", ".fctest.test");
 ```
 
 A browser only accepts a cookie scoped to a domain the page is **actually served from**.
 Loading the harness from `localhost`, `127.0.0.1` or a `github.io` URL and asking for a
-`.fctest.com` cookie gets you nothing — the browser discards it without an error, the
+`.fctest.test` cookie gets you nothing — the browser discards it without an error, the
 attribution tag appears to fire cleanly, and no cookie exists. That is the single most
 common way this test silently produces a false negative.
 
-Mapping `www.fctest.com` to `127.0.0.1` in `/etc/hosts` makes the browser believe it
-really is on `fctest.com`, so the cookie is accepted exactly as it would be in
+Mapping `www.fctest.test` to `127.0.0.1` in `/etc/hosts` makes the browser believe it
+really is on `fctest.test`, so the cookie is accepted exactly as it would be in
 production. The mapping is local to your machine and overrides public DNS.
 
-> **`fctest.com` is registered to someone else.** It currently resolves to
-> `13.223.25.84` / `54.243.117.197`. Your hosts entry overrides that locally, which is
-> what makes this safe and self-contained — but never point real traffic at
-> `fctest.com`, and don't publish a copy of the harness there. It isn't ours.
+> **`.test` can never be registered by anyone.** It is reserved by
+> [RFC 6761](https://www.rfc-editor.org/rfc/rfc6761) and is guaranteed not to resolve on
+> the public internet, so there is no real site behind this name and no way for a stray
+> request to reach a third party. That is why it is a better test domain than a
+> plausible-looking `.com` — with a real domain, a missing hosts entry silently loads
+> someone else's website instead of failing.
 
 ## Setup
 
 **1. Add the hosts entry** (once per machine):
 
 ```bash
-echo '127.0.0.1 www.fctest.com testmerchant.fctest.com' | sudo tee -a /etc/hosts
+echo '127.0.0.1 www.fctest.test testmerchant.fctest.test' | sudo tee -a /etc/hosts
 ```
 
 macOS and Linux both use `/etc/hosts`. On Windows it's
@@ -53,7 +60,7 @@ cookies silently vanish.
 **3. Open the landing page:**
 
 ```
-http://www.fctest.com:8000/
+http://www.fctest.test:8000/
 ```
 
 Confirm it worked in the debug drawer (press `d`) — the **Status** section shows the
@@ -89,8 +96,7 @@ CDN.
 
 ### If a developer says "it loads someone else's website"
 
-That is the hosts entry not taking effect. `fctest.com` is a real registered domain, so
-the failure mode is a stranger's page rather than a connection error. Usual causes, in
+That is the hosts entry not taking effect. `.test` never resolves publicly, so the failure mode is a clean DNS error. Usual causes, in
 order:
 
 1. The hosts line was never added, or was added to the wrong file.
@@ -106,7 +112,7 @@ cause immediately.
 
 ## Notes
 
-- **The port doesn't matter.** Cookies ignore port numbers, so `.fctest.com` on
+- **The port doesn't matter.** Cookies ignore port numbers, so `.fctest.test` on
   `:8000` behaves exactly like `:80`. Use port 80 if you want the bare hostname, but
   that needs `sudo ./serve.sh 80`.
 - **HTTP, not HTTPS.** Serving locally over plain HTTP is fine here: the cookie carries
@@ -117,14 +123,14 @@ cause immediately.
 - **Everyone tests the same build.** The repo is the source of truth; each developer
   serves their own checkout. Pull before a test round so you're not comparing runs
   across different revisions — `git log --oneline -1` is worth recording with results.
-- **GTM Preview works against this.** Enter `http://www.fctest.com:8000/` as the URL in
+- **GTM Preview works against this.** Enter `http://www.fctest.test:8000/` as the URL in
   Tag Assistant. The container is fetched from Google over HTTPS regardless of how the
   page is served.
 
 ## Undoing it
 
 ```bash
-sudo sed -i '' '/fctest\.com/d' /etc/hosts
+sudo sed -i '' '/fctest\.test/d' /etc/hosts
 ```
 
 Drop the `''` after `-i` on Linux.

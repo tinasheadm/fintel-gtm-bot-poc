@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Serve the harness on a *.fctest.com hostname so the attribution cookie can be
-# scoped to .fctest.com. Requires a one-time /etc/hosts entry — see
+# Serve the harness on a *.fctest.test hostname so the attribution cookie can be
+# scoped to .fctest.test. Requires a one-time /etc/hosts entry — see
 # docs/local-domain-setup.md.
 #
 # Usage:  ./serve.sh [port]        (default 8000)
@@ -9,7 +9,7 @@
 set -euo pipefail
 
 PORT="${1:-8000}"
-HOST="www.fctest.com"
+HOST="www.fctest.test"
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if ! grep -qE "^[^#]*\b${HOST//./\\.}\b" /etc/hosts 2>/dev/null; then
@@ -17,12 +17,12 @@ if ! grep -qE "^[^#]*\b${HOST//./\\.}\b" /etc/hosts 2>/dev/null; then
 
   ⚠  ${HOST} is not mapped in /etc/hosts.
 
-     Without it your browser resolves fctest.com to its real owner's servers,
-     the harness will not load, and the .fctest.com cookie cannot be set.
+     Without it the hostname does not resolve, the harness will not load,
+     and the .fctest.test cookie cannot be set.
 
      Add the mapping once:
 
-       echo '127.0.0.1 www.fctest.com testmerchant.fctest.com' | sudo tee -a /etc/hosts
+       echo '127.0.0.1 www.fctest.test testmerchant.fctest.test' | sudo tee -a /etc/hosts
 
      Then re-run this script.
 
@@ -33,7 +33,7 @@ fi
 echo
 echo "  Serving ${DIR}"
 echo "  Landing page:  http://${HOST}:${PORT}/"
-echo "  Cookie domain: .fctest.com"
+echo "  Cookie domain: .fctest.test"
 echo "  Ctrl-C to stop."
 echo
 
