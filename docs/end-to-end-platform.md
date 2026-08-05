@@ -211,38 +211,45 @@ document.cookie = "FcAtrId=" + id + ";"
 - The cookie is `SameSite=Strict`. It is written by our own page after the redirect, so
   the cross-site hop does not prevent it.
 
-## Environment mismatch — needs a decision from the Fintel dev team
+## Environment: use the production link
 
-The ad and tracking link are in the **QA3 sandbox**; the tags load **production**
-libraries. Probing the sandbox hosts:
+The first run used a QA3 sandbox link (`api.qa3.fintelsandbox.com`) while the tags load
+production libraries — a mismatch. **The scripts in this harness are the production
+ones, so the tracking link must be a production link too:**
 
-| URL | Result |
+```
+https://api.fintelconnect.com/t/l/<code>
+```
+
+There is no sandbox build of the attribution library —
+`app.qa3.fintelsandbox.com/scripts/fcanalytics/v1.js` returns an HTML SPA fallback, not
+JavaScript, and the sandbox-hosted pixel is byte-identical to production and posts to
+`api.fintelconnect.com` anyway. Production end to end is the supported path.
+
+## Identifiers, confirmed from the redirect
+
+The production link's 307 response settles what the numbers mean:
+
+```
+set-cookie: fintelTag-24490=a-27733b-24749c-
+set-cookie: clickId-24490=86765804
+location:   ...?finteltag=86765804&utm_campaign=a-27733b-24749c-
+```
+
+| Value | Meaning |
 |---|---|
-| `cdn.fintelconnect.com/scripts/fcanalytics/v1.js` | 200, 3837 bytes — the real library |
-| `app.qa3.fintelsandbox.com/scripts/fcanalytics/v1.js` | 200 but **HTML**, not JS — SPA fallback page, no sandbox build exists |
-| `app.fintelconnect.com/assets/scripts/fcanalytics.js` | 200, 2882 bytes |
-| `app.qa3.fintelsandbox.com/assets/scripts/fcanalytics.js` | 200, **byte-identical** to production |
+| **24490** | The **program ID** — the platform names its own cookies after it. `FC - Program ID` is correct as shipped; do not change it to the ad ID. |
+| **24749** | The **ad ID**, carried inside the campaign string as `b-24749`. Not an argument to `pxl()`. |
+| **27733** | The publisher, as `a-27733`. |
+| `finteltag` | The click ID, fresh on every click of the link. |
 
-Both pixel scripts post to `https://api.fintelconnect.com` — production. There is no
-sandbox build of the attribution library, and the sandbox-hosted pixel is just a mirror
-that still targets production.
+The platform also drops its own `HttpOnly; Secure` cookies on `api.fintelconnect.com`
+during the redirect. Those are separate from the first-party `FcAtrId` cookie our
+attribution tag writes on the landing page host — don't confuse the two when debugging.
 
-**So a click ID minted by `api.qa3.fintelsandbox.com` is being handed to scripts that
-report to the production API.** Whether that resolves is a question for whoever owns the
-platform. Ask them: *which script URLs should a QA3 sandbox integration use, and does
-production `api.fintelconnect.com` recognise a QA3 click ID?* Until that is answered, a
-sandbox run may fail for reasons that have nothing to do with this harness.
-
-## Identifier mismatches to reconcile
-
-| Harness value | Sandbox ad | Note |
-|---|---|---|
-| `FC - Program ID` = `24490` | Ad ID **24749** | Confirm whether `pxl()`'s first argument is the program ID or the ad ID |
-| `pid` default `Rewards` | Product **YarBarProd** | The product on the ad; `pid` probably has to match |
-| `testmerchantFC` | Merchant "Test Merchant" | Confirm the reference string the sandbox expects |
-
-Both are GTM Constant variables, so changing them is an edit in the GTM UI plus a
-publish — no code change.
+`pid` remains the merchant's own product label. The ad is configured with product
+`YarBarProd`, so that value is now selectable in the harness alongside the generic ones;
+use it for platform end-to-end runs so the pixel reports what the ad expects.
 
 ## The attribution library fingerprints the device
 
