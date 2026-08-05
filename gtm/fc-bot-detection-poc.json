@@ -228,7 +228,7 @@
           {
             "type": "TEMPLATE",
             "key": "javascript",
-            "value": "function () {\n  /*\n   * Cookie domain for fcpixel.attribution().\n   *\n   * Production is \".fintelconnect.com\". Anywhere else that value would be rejected\n   * by the browser (a cookie may only be scoped to the host it is set from, and\n   * \".github.io\" is a public suffix, so it is refused outright). Falling back to the\n   * exact hostname keeps the cookie working on GitHub Pages, localhost and any\n   * staging host without editing the tag between environments.\n   */\n  var host = document.location.hostname || \"\";\n  if (/(^|\\.)fintelconnect\\.com$/i.test(host)) return \".fintelconnect.com\";\n  return host;\n}"
+            "value": "function () {\n  /*\n   * Cookie domain for fcpixel.attribution().\n   *\n   * A browser only accepts a cookie scoped to a domain the page is actually served\n   * from, so this cannot be a literal \u2014 the harness runs on three kinds of host and\n   * the correct value differs on each:\n   *\n   *   *.fctest.com        -> \".fctest.com\"        dev testing (via /etc/hosts)\n   *   *.fintelconnect.com -> \".fintelconnect.com\" production\n   *   anything else       -> the exact hostname   localhost, github.io, staging\n   *\n   * The fallback still writes a cookie so the rest of the flow stays testable, but\n   * it is host-scoped and will not attribute on the Fintel platform.\n   */\n  var host = document.location.hostname || \"\";\n  if (/(^|\\.)fctest\\.com$/i.test(host)) return \".fctest.com\";\n  if (/(^|\\.)fintelconnect\\.com$/i.test(host)) return \".fintelconnect.com\";\n  return host;\n}"
           }
         ],
         "fingerprint": "0"

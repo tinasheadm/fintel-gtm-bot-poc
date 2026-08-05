@@ -117,17 +117,18 @@ remapped. Build the items by hand using section 3 below; it takes about ten minu
 ```js
 function () {
   var host = document.location.hostname || "";
+  if (/(^|\.)fctest\.com$/i.test(host)) return ".fctest.com";
   if (/(^|\.)fintelconnect\.com$/i.test(host)) return ".fintelconnect.com";
   return host;
 }
 ```
 
-**Why this exists.** The call scopes the cookie to `.fintelconnect.com`, and a browser
-only accepts a cookie scoped to a domain the page is served from. The harness is hosted
-at `testmerchant.fintelconnect.com` precisely so that value is valid — attribution
-cannot be tested anywhere else. Off that domain (localhost, a plain `github.io` URL) the
-variable falls back to the exact hostname so a cookie is still written and the rest of
-the flow stays testable, but that cookie will not attribute on the Fintel platform.
+**Why this exists.** A browser only accepts a cookie scoped to a domain the page is
+served from, so the correct value differs per environment: `.fctest.com` for dev testing
+(served from `www.fctest.com` via `/etc/hosts`), `.fintelconnect.com` in production.
+Anywhere else the variable falls back to the exact hostname — a cookie is still written
+and the rest of the flow stays testable, but it will not attribute on the Fintel
+platform. One tag, every environment, no edits.
 
 Also enable the built-in variables **Page URL, Page Hostname, Page Path, Referrer,
 Event, Debug Mode** (Variables → Configure).
@@ -165,10 +166,9 @@ arguments passed to Fintel are unchanged from the supplied snippets.
 
 ## 4. Preview and publish
 
-1. Click **Preview**, enter your test URL —
-   `https://testmerchant.fintelconnect.com/` or `http://localhost:8000`.
-   Attribution only behaves correctly on the fintelconnect.com host; see the cookie
-   domain note below.
+1. Click **Preview**, enter your test URL — `http://www.fctest.com:8000/`.
+   Use that hostname, not `localhost`: attribution cookies are scoped to `.fctest.com`
+   and cannot be set from anywhere else. See the cookie domain note below.
 2. Tag Assistant opens the site in a new tab and connects.
 3. Walk the flow: landing → offers → apply → submit.
 4. In Tag Assistant, check the left-hand event list:

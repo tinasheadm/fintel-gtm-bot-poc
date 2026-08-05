@@ -10,7 +10,7 @@ tag and is injected at runtime — that is the behaviour under test.
 - **Container:** `GTM-WFD2R889`
 - **Merchant ref:** `testmerchantFC`
 - **Program ID:** `24490`
-- **Host:** `testmerchant.fintelconnect.com` — the cookie domain requires it
+- **Dev test host:** `www.fctest.com` via `/etc/hosts` — cookie domain `.fctest.com`
 - Static HTML, one host, no build step.
 
 ---
@@ -30,13 +30,18 @@ carries its own fallback generator so it never posts an empty order ID.
 
 ## Getting started
 
-**Run it locally**
+**Run it** — one-time hosts entry, then serve:
 
 ```bash
-cd fintel-gtm-bot-poc && python3 -m http.server 8000
+echo '127.0.0.1 www.fctest.com testmerchant.fctest.com' | sudo tee -a /etc/hosts
 ```
 
-Then open <http://localhost:8000>.
+```bash
+./serve.sh
+```
+
+Then open <http://www.fctest.com:8000/>. Full explanation in
+[docs/local-domain-setup.md](docs/local-domain-setup.md).
 
 **Getting attributed traffic.** Register the landing page URL on the Fintel Connect
 platform. The platform generates the publisher tracking link and appends the
@@ -44,30 +49,39 @@ platform. The platform generates the publisher tracking link and appends the
 to a publisher on the Fintel side. Reaching the landing page directly, with no
 `finteltag`, is a legitimate test case: it's what unattributed traffic looks like.
 
-**Hosted copy** — <https://testmerchant.fintelconnect.com/>. That root URL *is* the
-landing page, and it's the URL to register on the Fintel Connect platform.
+**Hosted copy** — none. The harness runs locally on `www.fctest.com` so attribution can
+be tested without DNS. A publicly hosted copy would need a host under a domain we
+control; see the cookie domain note below for why that matters.
 
-## Why the site must be served from fintelconnect.com
+## Why a hosts entry, not just localhost
 
-The attribution call scopes its cookie to `.fintelconnect.com`. A browser only accepts a
-cookie scoped to a domain the page is actually served from, so on `*.github.io` — or any
-other host — that cookie is silently rejected and **no attribution happens at all**. The
-test is meaningless off-domain.
+The attribution call scopes its cookie to a domain, and a browser only accepts a cookie
+scoped to a domain the page is **actually served from**:
 
-So the harness is served from `testmerchant.fintelconnect.com`, via GitHub Pages with a
-custom domain. Two pieces:
+```js
+fcpixel.attribution("finteltag", 10, "last", "testmerchantFC", ".fctest.com");
+```
 
-1. **DNS** — a `CNAME` record for `testmerchant.fintelconnect.com` pointing at
-   `tinasheadm.github.io`. This is the one step that needs whoever administers
-   fintelconnect.com DNS.
-2. **Repo** — the [`CNAME`](CNAME) file at the repo root, already committed, plus
-   *Settings → Pages → Custom domain* set to the same hostname. Tick **Enforce HTTPS**
-   once the certificate is issued.
+Serve from `localhost` or a `github.io` URL and ask for a `.fctest.com` cookie, and the
+browser discards it silently — the tag looks like it fired cleanly and no cookie exists.
+That is the most common false negative in this test.
 
-The `FC - Cookie Domain` GTM variable resolves `.fintelconnect.com` on any
-`*.fintelconnect.com` host and falls back to the exact hostname elsewhere, so the same
-tag works on the real domain, on localhost, and on the plain `github.io` URL — the last
-of which is useful for testing everything *except* attribution.
+Mapping `www.fctest.com` to `127.0.0.1` in `/etc/hosts` makes the browser treat the page
+as genuinely on `fctest.com`, so the cookie is accepted exactly as in production. It's
+local to your machine, overrides public DNS, and needs no DNS administrator.
+
+> `fctest.com` is registered to a third party and resolves to real servers. The hosts
+> entry overrides that locally, which is what makes this safe — but don't point real
+> traffic at it or publish a copy there.
+
+The `FC - Cookie Domain` GTM variable resolves the right value per host, so one tag
+covers every environment:
+
+| Host | Cookie domain |
+|---|---|
+| `*.fctest.com` | `.fctest.com` — dev testing |
+| `*.fintelconnect.com` | `.fintelconnect.com` — production |
+| anything else | the exact hostname — cookie is written but won't attribute |
 
 ## Setting up GTM
 
@@ -100,23 +114,23 @@ not alter what the Fintel scripts do.
 
 ## Cookie domain — read this before you debug a "missing cookie"
 
-If the attribution tag fires but no cookie appears, check the hostname first. On
-`testmerchant.fintelconnect.com` the cookie is scoped to `.fintelconnect.com` and works.
-On any other host the `FC - Cookie Domain` variable falls back to that exact hostname, so
-a cookie is still set — but it is **not** a `.fintelconnect.com` cookie, and attribution
-against the real platform will not resolve. See the section above.
+If the attribution tag fires but no cookie appears, check the hostname in the debug
+drawer's **Status** section first. It reports whether the current host can scope the
+cookie at all. Nine times out of ten the answer is that the page was opened on
+`localhost` instead of `www.fctest.com`.
 
 ## Repo layout
 
 ```
 index.html  offers.html  apply.html  thank-you.html   the funnel
-CNAME                            custom domain for GitHub Pages
+serve.sh                         local server on www.fctest.com
 assets/fc-test-harness.js    dataLayer, order IDs, network+cookie instrumentation
 assets/debug-panel.js        the on-page drawer
 assets/styles.css
 gtm/fc-bot-detection-poc.json    importable GTM container
 gtm/generate-container.py        regenerates the above (python3, stdlib only)
 docs/coworker-guide.md           self-contained guide to send to reviewers
+docs/local-domain-setup.md       .fctest.com hosts-file setup, no DNS needed
 docs/gtm-setup.md                GTM account, container, tag and access setup
 docs/testing-guide.md            test scenarios incl. automated/bot runs
 ```

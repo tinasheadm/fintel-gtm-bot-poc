@@ -11,21 +11,24 @@ rather than hardcoding them.
 
 | | | |
 |---|---|---|
-| Landing page | <https://testmerchant.fintelconnect.com/> | ⏳ awaiting DNS |
+| Landing page | `http://www.fctest.com:8000/` (run locally) | ✅ no DNS needed |
 | Source code | <https://github.com/tinasheadm/fintel-gtm-bot-poc> | ✅ live |
 | GTM container | `GTM-WFD2R889` | |
 | Merchant ref | `testmerchantFC` | |
 | Fintel program ID | `24490` | |
 
-> **The landing page needs a DNS record before it resolves.** The source code link works
-> now. The landing page needs a `CNAME` record for `testmerchant.fintelconnect.com`
-> pointing at `tinasheadm.github.io`, added by whoever administers fintelconnect.com DNS.
-> The `CNAME` file is already committed to the repo.
+> **There is no hosted copy — you run it locally.** The dev test domain is
+> `.fctest.com`, set up with a one-line `/etc/hosts` entry on your own machine. No DNS
+> administrator, no hosting, about a minute:
 >
-> **It has to be a fintelconnect.com host — this is not a preference.** The attribution
-> call scopes its cookie to `.fintelconnect.com`, and a browser only accepts a cookie
-> scoped to a domain the page is actually served from. Hosted anywhere else the cookie is
-> silently rejected and no attribution happens, so the test measures nothing.
+> ```bash
+> echo '127.0.0.1 www.fctest.com testmerchant.fctest.com' | sudo tee -a /etc/hosts
+> ./serve.sh
+> ```
+>
+> Then open `http://www.fctest.com:8000/`. **Use that hostname, not `localhost`** — a
+> `.fctest.com` cookie cannot be set from any other host, and the failure is silent.
+> Full detail in `docs/local-domain-setup.md`.
 
 ---
 
@@ -104,27 +107,23 @@ The arguments passed to Fintel are unchanged. The benefit is that a blocked CDN 
 blocker, CSP, corporate proxy — produces a clean console error instead of an
 uncaught `fcpixel is not defined`.
 
-**2. The cookie domain is resolved per environment.** The call scopes the cookie to
-`.fintelconnect.com`, which is exactly why the harness is served from
-`testmerchant.fintelconnect.com` — that value is only valid on a fintelconnect.com host.
-The same pages also get run on localhost and on the plain `github.io` URL during
-development, where the browser would reject it. So the tag reads a GTM variable rather
-than a literal:
+**2. The cookie domain is resolved per environment.** A browser only accepts a cookie
+scoped to a domain the page is actually served from, so the correct value differs by
+host — `.fctest.com` for dev testing, `.fintelconnect.com` in production. Hardcoding
+either one breaks the other. So the tag reads a GTM variable rather than a literal:
 
 ```js
 function () {
   var host = document.location.hostname || "";
+  if (/(^|\.)fctest\.com$/i.test(host)) return ".fctest.com";
   if (/(^|\.)fintelconnect\.com$/i.test(host)) return ".fintelconnect.com";
-  return host;   // GitHub Pages, localhost, staging — scope to the exact host
+  return host;   // localhost, github.io — host-scoped, will not attribute
 }
 ```
 
-Same tag in every environment, no edits between them. On
-`testmerchant.fintelconnect.com` it returns `.fintelconnect.com` and attribution works.
-Anywhere else it falls back to the exact hostname, so a cookie is still written and the
-rest of the flow stays testable — but that cookie **will not attribute on the Fintel
-platform**. **If you're debugging a conversion that didn't attribute, check the hostname
-first.**
+Same tag in every environment, no edits between them. **If you're debugging a conversion
+that didn't attribute, check the hostname first** — the debug drawer's Status section
+tells you directly whether the current host can scope the cookie.
 
 ---
 

@@ -102,13 +102,19 @@ COOKIE_DOMAIN_JS = r"""function () {
   /*
    * Cookie domain for fcpixel.attribution().
    *
-   * Production is ".fintelconnect.com". Anywhere else that value would be rejected
-   * by the browser (a cookie may only be scoped to the host it is set from, and
-   * ".github.io" is a public suffix, so it is refused outright). Falling back to the
-   * exact hostname keeps the cookie working on GitHub Pages, localhost and any
-   * staging host without editing the tag between environments.
+   * A browser only accepts a cookie scoped to a domain the page is actually served
+   * from, so this cannot be a literal — the harness runs on three kinds of host and
+   * the correct value differs on each:
+   *
+   *   *.fctest.com        -> ".fctest.com"        dev testing (via /etc/hosts)
+   *   *.fintelconnect.com -> ".fintelconnect.com" production
+   *   anything else       -> the exact hostname   localhost, github.io, staging
+   *
+   * The fallback still writes a cookie so the rest of the flow stays testable, but
+   * it is host-scoped and will not attribute on the Fintel platform.
    */
   var host = document.location.hostname || "";
+  if (/(^|\.)fctest\.com$/i.test(host)) return ".fctest.com";
   if (/(^|\.)fintelconnect\.com$/i.test(host)) return ".fintelconnect.com";
   return host;
 }"""

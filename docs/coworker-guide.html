@@ -409,8 +409,8 @@
 <dl class="facts">
   <dt>Landing page</dt>
   <dd>
-    <a href="https://testmerchant.fintelconnect.com/">https://testmerchant.fintelconnect.com/</a>
-    <span class="chip pending">awaiting DNS</span>
+    http://www.fctest.com:8000/
+    <span class="chip yes">run locally</span>
   </dd>
   <dt>Source code</dt>
   <dd>
@@ -425,19 +425,20 @@
 </dl>
 
 <div class="callout alert">
-  <span class="label">The landing page needs a DNS record before it resolves</span>
+  <span class="label">There is no hosted copy — you run it locally</span>
   <p>
-    The source code link works now. The landing page does not yet: it needs a
-    <code>CNAME</code> record for <code>testmerchant.fintelconnect.com</code> pointing at
-    <code>tinasheadm.github.io</code>, which has to be added by whoever administers
-    fintelconnect.com DNS. The <code>CNAME</code> file is already committed to the repo.
+    The dev test domain is <code>.fctest.com</code>, set up with a one-line
+    <code>/etc/hosts</code> entry on your own machine. No DNS administrator, no hosting,
+    about a minute:
   </p>
+<pre><code>echo '127.0.0.1 www.fctest.com testmerchant.fctest.com' | sudo tee -a /etc/hosts
+./serve.sh</code></pre>
   <p>
-    <strong>It has to be a fintelconnect.com host — this is not a preference.</strong>
-    The attribution call scopes its cookie to <code>.fintelconnect.com</code>, and a
-    browser only accepts a cookie scoped to a domain the page is actually served from.
-    Hosted anywhere else, the cookie is silently rejected and no attribution happens, so
-    the test measures nothing.
+    Then open <code>http://www.fctest.com:8000/</code>.
+    <strong>Use that hostname, not <code>localhost</code>.</strong> A
+    <code>.fctest.com</code> cookie cannot be set from any other host, and the failure is
+    silent — the tag appears to fire cleanly and no cookie exists. Full detail in
+    <code>docs/local-domain-setup.md</code>.
   </p>
 </div>
 
@@ -532,7 +533,7 @@
   <h3>Step 1 — attribution, on the landing page</h3>
   <p>Creates the first-party cookie holding the publisher's information.</p>
 <pre><code><span class="cmt">// library: https://cdn.fintelconnect.com/scripts/fcanalytics/v1.js</span>
-fcpixel.attribution("finteltag", 10, "last", "testmerchantFC", COOKIE_DOMAIN);
+fcpixel.attribution("finteltag", 10, "last", "testmerchantFC", ".fctest.com");
 <span class="cmt">//                  query param  days  model   merchant ref</span></code></pre>
 
   <h3>Step 2 — conversion pixel, on the thank-you page</h3>
@@ -566,27 +567,26 @@ document.head.appendChild(s);</code></pre>
 
   <h4>The cookie domain resolves per environment</h4>
   <p>
-    The call scopes the cookie to <code>.fintelconnect.com</code>, which is exactly why
-    the harness is served from <code>testmerchant.fintelconnect.com</code> — that value
-    is only valid on a fintelconnect.com host. But the same pages also get run on
-    localhost and on the plain <code>github.io</code> URL during development, where the
-    browser would reject it. So the tag reads a GTM variable rather than a literal:
+    A browser only accepts a cookie scoped to a domain the page is actually served from,
+    so the correct value differs by host — <code>.fctest.com</code> for dev testing,
+    <code>.fintelconnect.com</code> in production. Hardcoding either one breaks the
+    other. So the tag reads a GTM variable rather than a literal:
   </p>
 <pre><code>function () {
   var host = document.location.hostname || "";
+  if (/(^|\.)fctest\.com$/i.test(host)) return ".fctest.com";
   if (/(^|\.)fintelconnect\.com$/i.test(host)) return ".fintelconnect.com";
-  return host;   <span class="cmt">// GitHub Pages, localhost, staging — scope to the exact host</span>
+  return host;   <span class="cmt">// localhost, github.io — host-scoped, will not attribute</span>
 }</code></pre>
 
   <div class="callout alert">
     <span class="label">If you only remember one thing</span>
     <p>
-      Same tag in every environment, no edits between them. On
-      <code>testmerchant.fintelconnect.com</code> it returns
-      <code>.fintelconnect.com</code> and attribution works. Anywhere else it falls back
-      to the exact hostname, so a cookie is still written and the rest of the flow stays
-      testable — but that cookie <strong>will not attribute on the Fintel platform</strong>.
-      When someone reports that a conversion didn't attribute, check the hostname first.
+      Same tag in every environment, no edits between them. When someone reports that a
+      conversion didn't attribute, <strong>check the hostname first</strong> — the debug
+      drawer's Status section says directly whether the current host can scope the
+      cookie. The usual answer is that the page was opened on <code>localhost</code>
+      instead of <code>www.fctest.com</code>.
     </p>
   </div>
 </section>
