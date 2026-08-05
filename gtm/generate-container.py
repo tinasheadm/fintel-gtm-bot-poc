@@ -102,23 +102,28 @@ COOKIE_DOMAIN_JS = r"""function () {
   /*
    * Cookie domain for fcpixel.attribution().
    *
-   * A browser only accepts a cookie scoped to a domain the page is actually served
-   * from, so this cannot be a literal — the harness runs on three kinds of host and
-   * the correct value differs on each:
+   * Confirmed against the shipped library (cdn.fintelconnect.com/scripts/
+   * fcanalytics/v1.js). It writes the cookie as:
+   *
+   *     document.cookie = "FcAtrId=" + id + ";"
+   *         + (domain === "" ? "" : "domain=" + domain + ";")
+   *         + "expires=...; path=/; SameSite=Strict"
+   *
+   * Two things follow. First, passing "" omits the domain attribute entirely,
+   * which host-scopes the cookie — that is the correct value on any host we do
+   * not own, and it cannot be rejected. Second, fcpixel.pxl() reads the cookie
+   * back with a plain document.cookie lookup for "FcAtrId"; it never inspects
+   * the domain attribute. So a host-scoped cookie attributes exactly like a
+   * dotted one as long as the funnel stays on a single host, which this one does.
    *
    *   *.fctest.test       -> ".fctest.test"       local dev (via /etc/hosts)
    *   *.fintelconnect.com -> ".fintelconnect.com" production
-   *   anything else       -> the exact hostname   github.io, localhost, staging
-   *
-   * The fallback is host-scoped rather than domain-scoped. For this funnel that is
-   * still a working first-party cookie — every page is on one host, and the pixel
-   * reads the cookie client-side on that same host. The domain attribute only
-   * becomes load-bearing if the funnel ever spans subdomains.
+   *   anything else       -> ""                   host-scoped, e.g. GitHub Pages
    */
   var host = document.location.hostname || "";
   if (/(^|\.)fctest\.test$/i.test(host)) return ".fctest.test";
   if (/(^|\.)fintelconnect\.com$/i.test(host)) return ".fintelconnect.com";
-  return host;
+  return "";
 }"""
 
 

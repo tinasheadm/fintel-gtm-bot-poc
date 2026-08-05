@@ -149,3 +149,104 @@ fcpixel.pxl(24490, orderID, pid, "", 0, 0, "", "testmerchantFC");
 
 Both run the identical build from the same repository. The only difference is where it
 is served from and, consequently, what the cookie is scoped to.
+
+---
+
+# Findings from the first live run (5 Aug 2026)
+
+Diagnosing why no cookie appeared after clicking a QA-sandbox tracking link. Recorded
+here because several of these are not obvious and will come up again.
+
+## The blocker: the GTM container was published but empty
+
+Fetching the live container directly:
+
+```bash
+curl -s "https://www.googletagmanager.com/gtm.js?id=GTM-WFD2R889" | grep -c fcpixel
+# 0
+```
+
+A valid, published container (~320 KB) with **zero** occurrences of `fcpixel`,
+`fcanalytics`, `fintelconnect`, `fc_landing_view` or `fc_application_submitted`. The
+tags were never in the live version, so nothing fired, no library loaded, and no cookie
+could exist — matching an entirely empty Application tab.
+
+**Importing is not publishing.** A container import lands in a *workspace*. Until you
+click **Submit → Publish**, the live container that browsers fetch is unchanged. This is
+the single most likely cause any time "the tag doesn't fire".
+
+Verify from the command line before debugging anything else — the grep above should
+return a non-zero count.
+
+## The tracking link itself is fine
+
+```
+https://api.qa3.fintelsandbox.com/t/l/HqFNXsGFX
+  → 301 → https://tinasheadm.github.io/fintel-gtm-bot-poc/
+          ?finteltag=62326338&mproduct=YarBarProd&publisherid=24489
+          &publishername=Test%20Publisher&fclid=AAAAA7cGQv75eppyA1MReM2z3kTXdLg
+```
+
+The redirect works, the landing page returns 200, and `finteltag` arrives. Nothing wrong
+on this side.
+
+## What the attribution library actually does
+
+Read from the shipped `v1.js`, which settles the cookie-domain question:
+
+```js
+document.cookie = "FcAtrId=" + id + ";"
+    + (domain === "" ? "" : "domain=" + domain + ";")
+    + "expires=...; path=/; SameSite=Strict";
+```
+
+- The cookie is named **`FcAtrId`**.
+- Passing `""` as the domain **omits the attribute entirely**, host-scoping the cookie.
+  That is now what the `FC - Cookie Domain` variable returns off our own domains — it
+  cannot be rejected, unlike a mismatched explicit domain.
+- `fcpixel.pxl()` reads the cookie back with a plain lookup for `FcAtrId` and never
+  inspects its domain. **A host-scoped cookie therefore attributes identically to a
+  dotted one** for a single-host funnel. The caveat previously flagged in this document
+  is resolved.
+- The cookie is `SameSite=Strict`. It is written by our own page after the redirect, so
+  the cross-site hop does not prevent it.
+
+## Environment mismatch — needs a decision from the Fintel dev team
+
+The ad and tracking link are in the **QA3 sandbox**; the tags load **production**
+libraries. Probing the sandbox hosts:
+
+| URL | Result |
+|---|---|
+| `cdn.fintelconnect.com/scripts/fcanalytics/v1.js` | 200, 3837 bytes — the real library |
+| `app.qa3.fintelsandbox.com/scripts/fcanalytics/v1.js` | 200 but **HTML**, not JS — SPA fallback page, no sandbox build exists |
+| `app.fintelconnect.com/assets/scripts/fcanalytics.js` | 200, 2882 bytes |
+| `app.qa3.fintelsandbox.com/assets/scripts/fcanalytics.js` | 200, **byte-identical** to production |
+
+Both pixel scripts post to `https://api.fintelconnect.com` — production. There is no
+sandbox build of the attribution library, and the sandbox-hosted pixel is just a mirror
+that still targets production.
+
+**So a click ID minted by `api.qa3.fintelsandbox.com` is being handed to scripts that
+report to the production API.** Whether that resolves is a question for whoever owns the
+platform. Ask them: *which script URLs should a QA3 sandbox integration use, and does
+production `api.fintelconnect.com` recognise a QA3 click ID?* Until that is answered, a
+sandbox run may fail for reasons that have nothing to do with this harness.
+
+## Identifier mismatches to reconcile
+
+| Harness value | Sandbox ad | Note |
+|---|---|---|
+| `FC - Program ID` = `24490` | Ad ID **24749** | Confirm whether `pxl()`'s first argument is the program ID or the ad ID |
+| `pid` default `Rewards` | Product **YarBarProd** | The product on the ad; `pid` probably has to match |
+| `testmerchantFC` | Merchant "Test Merchant" | Confirm the reference string the sandbox expects |
+
+Both are GTM Constant variables, so changing them is an edit in the GTM UI plus a
+publish — no code change.
+
+## The attribution library fingerprints the device
+
+`v1.js` dynamically imports **FingerprintJS v4** from `fpjscdn.net`. Directly relevant
+to the bot-detection POC: device fingerprinting is already part of the attribution path,
+so any automated run is being profiled by that library before our own signals are
+considered. Worth factoring into the test plan.

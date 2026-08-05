@@ -72,9 +72,11 @@
         'fcpixel object': typeof window.fcpixel !== 'undefined' ? 'present' : 'not loaded on this page',
         'page': location.pathname.split('/').pop() || 'index.html',
         'hostname': location.hostname || '(file://)',
-        'attribution host': /(^|\.)fintelconnect\.com$/i.test(location.hostname)
-          ? 'yes — cookie scopes to .fintelconnect.com'
-          : 'NO — off-domain, cookie will not attribute',
+        'FcAtrId cookie': (function () {
+          var m = document.cookie.match(/(?:^|;\s*)FcAtrId=([^;]*)/);
+          return m ? 'PRESENT — ' + decodeURIComponent(m[1])
+                   : 'absent — attribution tag has not run (or was blocked)';
+        })(),
         'finteltag (click ID)':
           new URLSearchParams(location.search).get('finteltag') ||
           '(none — direct/unattributed visit)',
