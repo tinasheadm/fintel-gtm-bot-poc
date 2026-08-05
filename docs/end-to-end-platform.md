@@ -253,8 +253,9 @@ The product an ad points at changes, so no product name is fixed anywhere in thi
 harness or in the GTM tags. **`24490` is the only constant.** The pid is resolved per
 session, in this order:
 
-1. **`mproduct` on the landing URL** — the platform's own product parameter. It appears
-   only on the first hop, so it is captured there and persisted for the session.
+1. **`product` on the landing URL** — from the `[mpid]` macro in the ad's URL template.
+   It appears only on the first hop, so it is captured there and persisted for the
+   session. `mproduct` is also accepted, since older links use that name.
 2. **An ad-sourced product is sticky.** Once step 1 has fired, an in-funnel link such as
    `apply.html?pid=Rewards` cannot replace it. Without that rule the harness's own
    navigation would silently overwrite the product the ad actually pointed at.
@@ -276,3 +277,59 @@ used), and a direct visit (stays empty).
 to the bot-detection POC: device fingerprinting is already part of the attribution path,
 so any automated run is being profiled by that library before our own signals are
 considered. Worth factoring into the test plan.
+
+
+---
+
+# The ad URL template
+
+The template configured on the Fintel ad:
+
+```
+utm_source=[pubname]-[sid]&utm_medium=affiliates&utm_campaign=a-[SID]b-[CID]c-[ACID]&finteltag=[clickid]&affiliateid=[subaffId]&subid-2=[subid2]&subid-3=[subid3]&subid-d4=[subid4]&product=[mpid]
+```
+
+Two macros drive the harness:
+
+| Macro | Parameter | Used for |
+|---|---|---|
+| `[clickid]` | `finteltag` | Read by `fcpixel.attribution()` and stored in the click-ID cookie |
+| `[mpid]` | `product` | Becomes the `pid` argument of `fcpixel.pxl()` |
+
+The rest (`utm_*`, `affiliateid`, `subid-*`) are passed through and recorded, but the
+harness does not act on them.
+
+## The trailing parameter has to be exactly `&product=[mpid]`
+
+Two earlier drafts of the template did not produce a `product` parameter at all. Both
+are silent failures — the page loads, the tag fires, and the pixel reports an empty
+product:
+
+| Template ending | What a browser parses | Result |
+|---|---|---|
+| `&subid-d4=[subid4]=product[mpid]` | `subid-d4` = `"=productYarBarProd"` | ❌ no `product` param |
+| `&subid-d4=[subid4]&=product[mpid]` | parameter with an **empty name** = `"productYarBarProd"` | ❌ no `product` param |
+| `&subid-d4=[subid4]&product=[mpid]` | `product` = `"YarBarProd"` | ✅ correct |
+
+The harness recovers the product from both broken forms so a regression does not block
+testing, but it flags the defect in the console and in the debug drawer's **URL
+template** row rather than hiding it. If you ever see that row say anything other than
+`ok`, the template needs fixing at the platform end.
+
+## The attribution cookies — a pair, not one
+
+`fcpixel.attribution("finteltag", 10, "last", "testmerchantFC", domain)` writes **two**
+cookies, and the merchant reference is lowercased into a cookie *name*:
+
+```
+FcAtrId         = "testmerchantfc"    a pointer to the cookie below
+testmerchantfc  = "<click id>"        the finteltag value from the URL
+```
+
+So the click ID lives in a cookie named after the merchant reference. A filter looking
+for names beginning `fc`/`fintel` misses it entirely — the harness follows the pointer
+instead of guessing.
+
+Also worth knowing: the library writes **nothing at all** when the `finteltag` parameter
+is absent. A direct visit with no tracking link legitimately produces no attribution
+cookie, so an empty Application tab in that case is correct behaviour, not a failure.

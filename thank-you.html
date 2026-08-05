@@ -138,10 +138,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   // Give the GTM tags a moment to run before reporting on the cookie.
   setTimeout(function () {
-    var fc = FCTest.fcCookies();
-    document.getElementById('r-cookie').textContent = fc.length
-      ? fc.map(function (c) { return c.name; }).join(', ')
-      : 'none found — see debug drawer';
+    var a = FCTest.attribution();
+    document.getElementById('r-cookie').textContent = a.complete
+      ? a.clickCookieName + ' = ' + a.clickId
+      : 'not set — see debug drawer';
   }, 1200);
 </script>
 <script src="assets/debug-panel.js"></script>

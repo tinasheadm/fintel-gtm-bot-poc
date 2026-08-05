@@ -22,6 +22,10 @@
 
   var STORAGE_KEY = 'fc_test_order_id';
   var PID_KEY = 'fc_test_pid';
+  // fcpixel.attribution() lowercases its merchantRef argument and uses it as a
+  // cookie name, so "testmerchantFC" becomes the cookie "testmerchantfc".
+  var MERCHANT_REF = 'testmerchantFC';
+  var CLICK_COOKIE = MERCHANT_REF.toLowerCase();
   var PID_SRC_KEY = 'fc_test_pid_src';   // 'ad' | 'funnel'
   var LOG_KEY = 'fc_test_netlog';
   var WATCH = /fintelconnect\.com/i;
@@ -79,8 +83,10 @@
    * The pid reported by the conversion pixel is whatever product the Fintel ad
    * points at, so nothing about it is fixed here. Resolution order:
    *
-   *   1. `mproduct` on the landing URL — the platform's own product parameter.
-   *      Captured once and persisted, because it only appears on the first hop.
+   *   1. `product` on the landing URL — the platform's product parameter, from
+   *      the [mpid] macro in the ad's URL template. `mproduct` is accepted too,
+   *      as older links use that name. Captured once and persisted, because it
+   *      only appears on the first hop.
    *   2. `pid` on the current URL — a product chosen inside the funnel.
    *   3. Whatever was stored earlier this session.
    *   4. Empty. The pixel tag does not invent one.
@@ -90,7 +96,7 @@
   FCTest.resolvePid = function () {
     var qs = new URLSearchParams(location.search);
 
-    var fromAd = qs.get('mproduct');
+    var fromAd = qs.get('product') || qs.get('mproduct') || salvageProduct(qs);
     if (fromAd) return FCTest.setPid(fromAd, 'ad');
 
     // An ad-sourced product is sticky for the rest of the session. Without this,
@@ -103,6 +109,44 @@
 
     return FCTest.getPid();
   };
+
+  /**
+   * Recover the product from a malformed tracking template.
+   *
+   * The ad URL template currently ends with:
+   *
+   *     &subid-d4=[subid4]=product[mpid]     -> lands inside subid-d4
+   *     &subid-d4=[subid4]&=product[mpid]    -> parameter with an empty name
+   *
+   * Neither produces a `product` parameter. The template must end:
+   *
+   *     &subid-d4=[subid4]&product=[mpid]
+   *
+   * The live template is correct; this exists so a regression in the template is
+   * recovered rather than silently reporting an empty product — and is flagged
+   * loudly rather than papered over.
+   */
+  function salvageProduct(qs) {
+    // '' catches `&=product[mpid]`, which yields a parameter with an empty name.
+    var keys = ['', 'subid-d4', 'subid-4', 'subid-3', 'subid-2'];
+    for (var i = 0; i < keys.length; i++) {
+      var raw = qs.get(keys[i]);
+      var m = raw && raw.match(/^=?product(.+)$/i);
+      if (m && m[1]) {
+        FCTest.templateDefect =
+          'Product recovered from ' +
+          (keys[i] === '' ? 'an unnamed parameter' : '"' + keys[i] + '"') +
+          ' — the ad URL template is malformed. It must end with ' +
+          '&product=[mpid]; neither "=product[mpid]" nor "&=product[mpid]" ' +
+          'produces a product parameter.';
+        if (window.console && window.console.warn) {
+          window.console.warn('[FCTest] ' + FCTest.templateDefect);
+        }
+        return m[1];
+      }
+    }
+    return null;
+  }
 
   FCTest.getPid = function () {
     try { return window.sessionStorage.getItem(PID_KEY) || ''; }
@@ -273,12 +317,49 @@
     }).filter(function (c) { return c.name; });
   };
 
-  /** Cookies that look like they came from the Fintel attribution script. */
+  /**
+   * The attribution cookies, as the library actually writes them.
+   *
+   * fcpixel.attribution() writes a PAIR:
+   *   FcAtrId          = "<merchantref lowercased>"   a pointer
+   *   <merchantref>    = "<click id>"                 the click ID itself
+   *
+   * so for merchantRef "testmerchantFC" the click ID lives in a cookie named
+   * "testmerchantfc". A name-prefix filter would miss it entirely, which is why
+   * the pointer is followed rather than guessed at.
+   *
+   * Note the library writes nothing at all when the finteltag parameter is
+   * absent — a direct visit legitimately produces no attribution cookie.
+   */
+  FCTest.attribution = function () {
+    var all = FCTest.cookies();
+    function val(name) {
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].name === name) return decodeURIComponent(all[i].value);
+      }
+      return null;
+    }
+    var pointer = val('FcAtrId');
+    var clickCookie = pointer || CLICK_COOKIE;
+    return {
+      pointerCookie: 'FcAtrId',
+      pointerValue: pointer,
+      clickCookieName: clickCookie,
+      clickId: val(clickCookie),
+      complete: !!(pointer && val(clickCookie))
+    };
+  };
+
+  /** Cookies written by the Fintel attribution script, for display. */
   FCTest.fcCookies = function () {
+    var a = FCTest.attribution();
     return FCTest.cookies().filter(function (c) {
-      return /^(fc|fintel)/i.test(c.name);
+      return c.name === 'FcAtrId' || c.name === a.clickCookieName ||
+             /^(fc|fintel)/i.test(c.name);
     });
   };
+
+  FCTest.merchantRef = function () { return MERCHANT_REF; };
 
   FCTest.clearCookies = function () {
     FCTest.cookies().forEach(function (c) {

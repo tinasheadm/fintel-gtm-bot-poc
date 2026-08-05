@@ -92,8 +92,12 @@ Full walkthrough in **[docs/gtm-setup.md](docs/gtm-setup.md)**. The short versio
 
 1. In GTM → **Admin → Import Container**, upload
    [`gtm/fc-bot-detection-poc.json`](gtm/fc-bot-detection-poc.json).
-2. Choose the **Default** workspace and **Merge → Overwrite conflicting**.
-3. Preview, walk the flow, publish.
+2. Workspace **Default Workspace**, import option **Overwrite**.
+3. **Add to workspace**, then **Submit → Publish** — importing alone changes nothing
+   that browsers can see.
+
+Step-by-step, including verification and rollback, in
+**[docs/pushing-to-gtm.md](docs/pushing-to-gtm.md)**.
 
 The import brings in 2 tags, 2 triggers and 5 variables. Nothing else in the container
 is touched.
@@ -134,6 +138,7 @@ assets/styles.css
 gtm/fc-bot-detection-poc.json    importable GTM container
 gtm/generate-container.py        regenerates the above (python3, stdlib only)
 docs/coworker-guide.md           self-contained guide to send to reviewers
+docs/pushing-to-gtm.md           regenerate, import and publish the container
 docs/local-domain-setup.md       .fctest.test hosts-file setup, no DNS needed
 docs/end-to-end-platform.md      running it against the Fintel platform
 docs/gtm-setup.md                GTM account, container, tag and access setup

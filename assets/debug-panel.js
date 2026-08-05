@@ -72,11 +72,24 @@
         'fcpixel object': typeof window.fcpixel !== 'undefined' ? 'present' : 'not loaded on this page',
         'page': location.pathname.split('/').pop() || 'index.html',
         'hostname': location.hostname || '(file://)',
-        'FcAtrId cookie': (function () {
-          var m = document.cookie.match(/(?:^|;\s*)FcAtrId=([^;]*)/);
-          return m ? 'PRESENT — ' + decodeURIComponent(m[1])
-                   : 'absent — attribution tag has not run (or was blocked)';
+        'FcAtrId (pointer)': (function () {
+          var a = FCTest.attribution();
+          return a.pointerValue
+            ? 'points to cookie "' + a.pointerValue + '"'
+            : 'absent — attribution tag has not run (or was blocked)';
         })(),
+        'click ID cookie': (function () {
+          var a = FCTest.attribution();
+          return a.clickId
+            ? a.clickCookieName + ' = ' + a.clickId
+            : 'absent — no click ID stored';
+        })(),
+        'attribution complete': FCTest.attribution().complete ? 'YES' : 'NO',
+        'product (pid)': FCTest.getPid() || '(none supplied)',
+        'pid source': FCTest.pidSource() === 'ad' ? 'the Fintel ad'
+                    : FCTest.pidSource() === 'funnel' ? 'chosen in the funnel'
+                    : '(unset)',
+        'URL template': FCTest.templateDefect || 'ok',
         'finteltag (click ID)':
           new URLSearchParams(location.search).get('finteltag') ||
           '(none — direct/unattributed visit)',
