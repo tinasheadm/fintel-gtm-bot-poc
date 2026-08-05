@@ -40,11 +40,15 @@ macOS and Linux both use `/etc/hosts`. On Windows it's
 **2. Start the server** from the repo root:
 
 ```bash
-./serve.sh
+python3 serve.py
 ```
 
-It refuses to start with a clear message if the hosts entry is missing, then serves on
-port 8000.
+`serve.py` works on macOS, Linux and Windows. On a Unix shell you can use `./serve.sh`
+instead — same thing, bash only.
+
+Either one refuses to start if the test hostname doesn't resolve to your machine, and
+prints the fix. That check is deliberate: without it you would be testing a build whose
+cookies silently vanish.
 
 **3. Open the landing page:**
 
@@ -55,6 +59,50 @@ http://www.fctest.com:8000/
 Confirm it worked in the debug drawer (press `d`) — the **Status** section shows the
 hostname and whether the current host can scope the attribution cookie. The **Cookies**
 section should list a Fintel cookie once the GTM tag fires.
+
+## Rolling this out to the dev team
+
+Every developer runs their **own** copy. `127.0.0.1` is their machine, so there is no
+shared URL and no server to maintain — but it does mean each person completes the setup
+once. What they need:
+
+| Requirement | Notes |
+|---|---|
+| The repo | `git clone https://github.com/tinasheadm/fintel-gtm-bot-poc.git` |
+| Python 3 | Preinstalled on macOS and most Linux. Windows: python.org or the Store. |
+| **Permission to edit the hosts file** | `sudo` on macOS/Linux, Administrator on Windows. **This is the one that actually blocks people** — locked-down corporate laptops often prevent it, and some endpoint-security agents revert changes to the hosts file silently. Check this before promising a timeline. |
+
+Everything else is shared and needs no per-developer setup: the GTM container
+(`GTM-WFD2R889`) is fetched from Google, and the Fintel libraries come from their own
+CDN.
+
+### Consequences of everyone sharing one container and one program
+
+- **One GTM container.** A change one person publishes affects everyone's next run. Have
+  each person work in their own workspace and keep publish rights with one owner.
+- **One Fintel program (`24490`).** Every developer's test conversions land in the same
+  program, mixed together. Agree an order-ID convention before a coordinated round, or
+  the results are hard to attribute back to whoever generated them.
+- **Cookies are per-machine and per-browser profile.** That is helpful — runs are
+  naturally isolated — but it also means nobody can reproduce your cookie state from
+  their own machine. Share the drawer's **Copy report** JSON instead.
+
+### If a developer says "it loads someone else's website"
+
+That is the hosts entry not taking effect. `fctest.com` is a real registered domain, so
+the failure mode is a stranger's page rather than a connection error. Usual causes, in
+order:
+
+1. The hosts line was never added, or was added to the wrong file.
+2. **DNS-over-HTTPS / "Secure DNS"** enabled in the browser, which can bypass the OS
+   resolver. Turn it off for testing: Chrome → Settings → Privacy and security → Security
+   → Use secure DNS; Firefox → Settings → Privacy & Security → DNS over HTTPS.
+3. A corporate DNS client or VPN agent that resolves independently of the hosts file.
+4. Stale DNS cache — `sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder` on
+   macOS, `ipconfig /flushdns` on Windows.
+
+`serve.py` reports what the hostname currently resolves to, which usually identifies the
+cause immediately.
 
 ## Notes
 
@@ -68,7 +116,7 @@ section should list a Fintel cookie once the GTM tag fires.
   setup.
 - **Everyone tests the same build.** The repo is the source of truth; each developer
   serves their own checkout. Pull before a test round so you're not comparing runs
-  across different revisions.
+  across different revisions — `git log --oneline -1` is worth recording with results.
 - **GTM Preview works against this.** Enter `http://www.fctest.com:8000/` as the URL in
   Tag Assistant. The container is fetched from Google over HTTPS regardless of how the
   page is served.

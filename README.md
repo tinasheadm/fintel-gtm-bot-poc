@@ -37,7 +37,7 @@ echo '127.0.0.1 www.fctest.com testmerchant.fctest.com' | sudo tee -a /etc/hosts
 ```
 
 ```bash
-./serve.sh
+python3 serve.py
 ```
 
 Then open <http://www.fctest.com:8000/>. Full explanation in
@@ -123,7 +123,8 @@ cookie at all. Nine times out of ten the answer is that the page was opened on
 
 ```
 index.html  offers.html  apply.html  thank-you.html   the funnel
-serve.sh                         local server on www.fctest.com
+serve.py                         local server on www.fctest.com (all platforms)
+serve.sh                         same, bash-only convenience wrapper
 assets/fc-test-harness.js    dataLayer, order IDs, network+cookie instrumentation
 assets/debug-panel.js        the on-page drawer
 assets/styles.css
